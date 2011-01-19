@@ -44,6 +44,14 @@ public class TrapHandler extends InstructionHandler {
 				}
 		
 				break;
+			case 0x22:
+				int memLocation = state.registers[0];
+				while (memory.read(memLocation) != 0) {
+					System.out.print((char)memory.read(memLocation));
+					memLocation++;
+					
+				}
+				break;
 				
 				
 		}
