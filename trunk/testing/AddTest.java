@@ -48,6 +48,7 @@ public class AddTest {
 		new AddHandler().execute(0x12C1, this.state, this.bank);
 		int reg1 = state.registers[1];
 		assertEquals("Should equal 6B", 0x6B, reg1);		 
+		assertEquals("CCR Positive bit should be set", state.ccrPositive, true);
 	}
 	
 	/**
@@ -61,11 +62,14 @@ public class AddTest {
 		new AddHandler().execute(0x12C1, this.state, this.bank);
 		int reg1 = state.registers[1];
 		assertEquals("Should equal 0x0", 0x0, reg1);
+		assertEquals("CCR Zero bit should be set", state.ccrZero, true);
 		
 		state.registers[3] = 0x4;
 		new AddHandler().execute(0x12C1, this.state, this.bank);
 		reg1 = state.registers[1];
 		assertEquals("Should equal 0x4", 0x4, reg1);
+		assertEquals("CCR Positive should be set", state.ccrPositive, true);
+		assertEquals("CCR Zero should not be set", state.ccrZero, false);
 	}
 	
 	/**
@@ -77,6 +81,8 @@ public class AddTest {
 		state.registers[1] = -264;
 		new AddHandler().execute(0x1A45, this.state, this.bank);
 		assertEquals("Should equal -265", -629, state.registers[5]);
+		assertEquals("CCR Negative should be set", state.ccrNegative, true);
+		assertEquals("CCR Zero should not be set", state.ccrZero, false);
 	}
 	
 	/**
@@ -89,6 +95,7 @@ public class AddTest {
 		state.registers[1] = 32767;
 		new AddHandler().execute(0x1A45, this.state, this.bank);
 		assertEquals("Should equal 0xFFFE", state.registers[5], -2);
+		assertEquals("CCR Negative should be set", state.ccrNegative, true);
 	}
 	
 	/**
@@ -100,6 +107,7 @@ public class AddTest {
 		state.registers[1] = -32764;
 		new AddHandler().execute(0x1A45, this.state, this.bank);
 		assertEquals("Should equal 8", state.registers[5], 8);		
+		assertEquals("CCR Positive should be set", state.ccrPositive, true);
 	}
 	
 	/**
@@ -115,7 +123,9 @@ public class AddTest {
 		state.registers[1] = 0x2A;
 		new AddHandler().execute(0x166F, this.state, this.bank);
 		assertEquals("Should equal 0x39", 0x39, state.registers[3]);
-		}
+		assertEquals("CCR positive should be set", state.ccrPositive, true);
+		
+	}
 	
 	/**
 	 * Tests addition of a number plus zero.
@@ -125,6 +135,7 @@ public class AddTest {
 		state.registers[1] = 0x2A;
 		new AddHandler().execute(0x1660, this.state, this.bank);
 		assertEquals("Should be 0x2A", 0x2A, state.registers[3]);
+		assertEquals("CCR zero shouldn't be set", state.ccrZero, false);
 	}
 	
 	/**
@@ -135,6 +146,7 @@ public class AddTest {
 		state.registers[1] = -365;
 		new AddHandler().execute(0x167B, this.state, this.bank);
 		assertEquals("Should equal -370", -370, state.registers[3]);
+		assertEquals("CCR Negative should be set", state.ccrNegative, true);
 	}
 	
 }
