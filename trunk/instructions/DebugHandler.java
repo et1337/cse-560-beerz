@@ -15,12 +15,16 @@ public class DebugHandler extends InstructionHandler {
 	 * Total number of registers.
 	 */
 	private static final int REG_COUNT = 8;
+	/**
+	 * Mask used to eliminate top 8 bits.
+	 */
+	private static final int HEX_MASK = 0x0000FFFF;
 /** 
  * This method displays the contents of the program counter, registers and the ccr.
  */
 	@Override
 	public void execute(int instruction, MachineState state, MemoryBank memory) {
-	System.out.println("Progam Counter = 0x" + Integer.toHexString(state.programCounter));
+	System.out.println("Progam Counter = 0x" + Integer.toHexString(state.programCounter & HEX_MASK).toUpperCase());
 		int n = 0;
 		int z = 0;
 		int p = 0;
@@ -28,7 +32,7 @@ public class DebugHandler extends InstructionHandler {
 		for (int i = 0; i < REG_COUNT; i++) 
 		{
 			
-			System.out.println("Register " + i + " = 0x" + Integer.toHexString(state.registers[i]));
+			System.out.println("Register " + i + " = 0x" + Integer.toHexString(state.registers[i] & HEX_MASK).toUpperCase());
 			
 		}
 		if (state.ccrNegative == true) {
