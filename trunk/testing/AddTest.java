@@ -35,6 +35,10 @@ public class AddTest {
 	}
 	
 	/**
+	 * First set of tests are for register plus register addition.
+	 */
+	
+	/**
 	 * Tests positive addition
 	 */
 	@Test
@@ -91,11 +95,46 @@ public class AddTest {
 	 * Tests overflow produced by the addition of two negative numbers
 	 */
 	@Test
-	public void addPosOverflowTest(){
+	public void addPosOverflowTest() {
 		state.registers[5] = -32764;
 		state.registers[1] = -32764;
 		new AddHandler().execute(0x1A45, this.state, this.bank);
 		assertEquals("Should equal 8", state.registers[5], 8);		
+	}
+	
+	/**
+	 * Second set of tests are for register plus immediate operand
+	 * 
+	 */
+	
+	/**
+	 * Tests addition of two positive numbers.
+	 */
+	@Test
+	public void addPosImmTest() {
+		state.registers[1] = 0x2A;
+		new AddHandler().execute(0x166F, this.state, this.bank);
+		assertEquals("Should equal 0x39", 0x39, state.registers[3]);
+		}
+	
+	/**
+	 * Tests addition of a number plus zero.
+	 */
+	@Test
+	public void addZeroImmTest() {
+		state.registers[1] = 0x2A;
+		new AddHandler().execute(0x1660, this.state, this.bank);
+		assertEquals("Should be 0x2A", 0x2A, state.registers[3]);
+	}
+	
+	/**
+	 * Tests addition of two negative numbers.
+	 */
+	@Test
+	public void addNegImmTest() {
+		state.registers[1] = -365;
+		new AddHandler().execute(0x167B, this.state, this.bank);
+		assertEquals("Should equal -370", -370, state.registers[3]);
 	}
 	
 }
