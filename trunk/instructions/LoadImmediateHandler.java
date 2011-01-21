@@ -45,5 +45,21 @@ public class LoadImmediateHandler extends InstructionHandler {
 		pc = pc << SHIFT;
 		pc = pc + pgOffset;
 		state.registers[destRegister] = memory.read(memory.read(pc));
+		//update the CCR base on the contents of the destination register
+		if (state.registers[destRegister] == 0) {
+			state.ccrZero = true;
+			state.ccrNegative = false;
+			state.ccrPositive = false;
+		} else {
+			if (state.registers[destRegister] > 0) {
+				state.ccrZero = false;
+				state.ccrNegative = false;
+				state.ccrPositive = true;
+			} else {
+				state.ccrZero = false;
+				state.ccrNegative = true;
+				state.ccrPositive = false;
+			}
+		}
 	}
 }

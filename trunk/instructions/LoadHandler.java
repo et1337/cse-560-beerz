@@ -18,6 +18,9 @@ public class LoadHandler extends InstructionHandler {
 	 * @param state
 	 *            The MachineState to use and modify.
 	 */
+	/**
+	 * Offset of the first bit of the destination register.
+	 */
 	private static final int DEST_LOW_BIT = 9;
 	/**
 	 * Offset of the last bit of the destination register.
@@ -52,5 +55,21 @@ public class LoadHandler extends InstructionHandler {
 		pc = pc << SHIFT;
 		pc = pc + pgOffset;
 		state.registers[destRegister] = memory.read(pc);
+		//update the CCR base on the contents of the destination register
+		if (state.registers[destRegister] == 0) {
+			state.ccrZero = true;
+			state.ccrNegative = false;
+			state.ccrPositive = false;
+		} else {
+			if (state.registers[destRegister] > 0) {
+				state.ccrZero = false;
+				state.ccrNegative = false;
+				state.ccrPositive = true;
+			} else {
+				state.ccrZero = false;
+				state.ccrNegative = true;
+				state.ccrPositive = false;
+			}
+		}
 	}
 }
