@@ -86,6 +86,35 @@ public class AddTest {
 	}
 	
 	/**
+	 * Tests addition with a negative and positive number.
+	 */
+	@Test
+	public void addMixedTest() {
+		//Result will be negative
+		state.registers[5] = -0x10AA;
+		state.registers[1] = 0x4AD;
+		new AddHandler().execute(0x1A45, this.state, this.bank);
+		assertEquals("Should equal -0xBFD", -0xBFD, this.state.registers[5]);
+		assertEquals("Negative CCR should be set", true, this.state.ccrNegative);
+		
+		//Result will be positive
+		state.registers[5] = 0x10AA;
+		state.registers[1] = -0x4AD;
+		new AddHandler().execute(0x1A45, this.state, this.bank);
+		assertEquals("Should equal 0xBFD", 0xBFD, this.state.registers[5]);
+		assertEquals("Positive ccr should be set", true, this.state.ccrPositive);
+		
+		//Result will be zero
+		state.registers[5] = 0x4EA;
+		state.registers[1] = -0x4EA;
+		new AddHandler().execute(0x1A45, this.state, this.bank);
+		assertEquals("Should equal 0x0", 0x0, this.state.registers[5]);
+		assertEquals("CCR bit should be zero", true, this.state.ccrZero);
+		
+		
+	}
+	
+	/**
 	 * Tests overflow produced by the addition of two positive numbers.
 	 * Example given in the Machine Characteristics handout.
 	 */
