@@ -13,5 +13,6 @@ public class ReturnHandler extends InstructionHandler {
 	 */
 	@Override
 	public void execute(int instruction, MachineState state, MemoryBank memory) {
+		state.programCounter = state.registers[6];
 	}
 }
