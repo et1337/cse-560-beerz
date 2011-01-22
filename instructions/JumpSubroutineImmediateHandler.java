@@ -19,6 +19,11 @@ public class JumpSubroutineImmediateHandler extends InstructionHandler {
 	 * Offset of the high bit of the page offset in the instruction
 	 */
 	private static final int PG_HI_BIT = 9;
+	/**
+	 * Number of bit to shift the program counter in order to clear out the low
+	 * order bits.
+	 */
+	private static final int SHIFT = 9;
 	@Override
 	/**
 	 * Execute will extract the page offset from the instruction,
@@ -29,6 +34,13 @@ public class JumpSubroutineImmediateHandler extends InstructionHandler {
 		int pc = state.programCounter;
 		int pgOffset = ByteOperations.extractValue(instruction, PG_LOW_BIT, PG_HI_BIT);
 		
-		// Set register seven equal to 
+		// Set register seven equal to the incoming program counter
+		state.registers[6] = (short) pc;
+		
+		// Set program counter equal to page offset
+		pc = pc >> SHIFT;
+		pc = pc << SHIFT;
+		pc = pc + pgOffset;
+		state.programCounter = pc;		
 	}
 }
