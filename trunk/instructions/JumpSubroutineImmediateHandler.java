@@ -33,6 +33,10 @@ public class JumpSubroutineImmediateHandler extends InstructionHandler {
 	 * order bits.
 	 */
 	private static final int SHIFT = 9;
+	/**
+	 * Register to hold the return pc instruction.
+	 */
+	private static final int REG = 7;
 	@Override
 	/**
 	 * Execute will extract the page offset from the instruction,
@@ -45,7 +49,7 @@ public class JumpSubroutineImmediateHandler extends InstructionHandler {
 		int linkBit = ByteOperations.extractValue(instruction, L_LOW_BIT, L_HI_BIT);
 		// Set register seven equal to the incoming program counter if link bit is set
 		if (linkBit == 1) {
-			state.registers[7] = (short) pc;
+			state.registers[REG] = (short) pc;
 		}
 		
 		

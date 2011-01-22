@@ -11,8 +11,12 @@ public class ReturnHandler extends InstructionHandler {
 	 * @param instruction The integer value of the instruction to execute, including the four op-code bits.
 	 * @param state The MachineState to use and modify.
 	 */
+	/**
+	 * Register to hold the return pc instruction.
+	 */
+	private static final int REG = 7;
 	@Override
 	public void execute(int instruction, MachineState state, MemoryBank memory) {
-		state.programCounter = state.registers[6];
+		state.programCounter = state.registers[REG];
 	}
 }

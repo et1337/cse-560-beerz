@@ -43,7 +43,10 @@ public class JumpSubroutineRegisterHandler extends InstructionHandler {
 	 * Offset of the high bit of the Link bit.
 	 */
 	private static final int L_HI_BIT = 12;
-
+	/**
+	 * Register to hold the return pc instruction.
+	 */
+	private static final int REG = 7;
 	@Override
 	public void execute(int instruction, MachineState state, MemoryBank memory) {
 		int pc = state.programCounter;
@@ -58,7 +61,7 @@ public class JumpSubroutineRegisterHandler extends InstructionHandler {
 		// Set register seven equal to the incoming program counter if link bit
 		// is set
 		if (linkBit == 1) {
-			state.registers[7] = (short) pc;
+			state.registers[REG] = (short) pc;
 		}
 		index = index & ZERO_MASK;
 		state.programCounter = (memory.read(state.registers[baseRegister] + index));
