@@ -49,7 +49,7 @@ public class StoreImmediateHandler extends InstructionHandler {
 		pc = pc + pgOffset;
 		
 		// Write value in source register to address formed above
-		memory.write(pc, state.registers[srcRegister]);
+		memory.write(memory.read(pc), state.registers[srcRegister]);
 		
 		// Update the CCR base on the contents of the source register
 		if (state.registers[srcRegister] == 0) {
