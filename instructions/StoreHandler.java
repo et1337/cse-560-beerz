@@ -51,21 +51,6 @@ public class StoreHandler extends InstructionHandler {
 		// Write value in source register to address formed above
 		memory.write(pc, state.registers[srcRegister]);
 		
-		// Update the CCR base on the contents of the source register
-		if (state.registers[srcRegister] == 0) {
-			state.ccrZero = true;
-			state.ccrNegative = false;
-			state.ccrPositive = false;
-		} else {
-			if (state.registers[srcRegister] > 0) {
-				state.ccrZero = false;
-				state.ccrNegative = false;
-				state.ccrPositive = true;
-			} else {
-				state.ccrZero = false;
-				state.ccrNegative = true;
-				state.ccrPositive = false;
-			}
-		}
+		
 	}
 }
