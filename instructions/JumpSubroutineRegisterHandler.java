@@ -1,17 +1,66 @@
 package instructions;
+
 import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
+
 /**
  * Handles a certain type of instruction.
  */
 public class JumpSubroutineRegisterHandler extends InstructionHandler {
 	/**
-	 * Executes the given instruction, manipulating the given MachineState accordingly.
-	 * @param instruction The integer value of the instruction to execute, including the four op-code bits.
-	 * @param state The MachineState to use and modify.
+	 * Executes the given instruction, manipulating the given MachineState
+	 * accordingly.
+	 * 
+	 * @param instruction
+	 *            The integer value of the instruction to execute, including the
+	 *            four op-code bits.
+	 * @param state
+	 *            The MachineState to use and modify.
 	 */
+	private static final int BASE_LOW_BIT = 6;
+	/**
+	 * Offset of the last bit of the base register.
+	 */
+	private static final int BASE_HI_BIT = 9;
+	/**
+	 * Offset of the low bit of the index.
+	 */
+	private static final int INDEX_LOW_BIT = 0;
+	/**
+	 * Offset of the high bit of the index.
+	 */
+	private static final int INDEX_HI_BIT = 6;
+	/**
+	 * Value used to zero extend the value of the index.
+	 */
+	private static final int ZERO_MASK = 0x003F;
+	/**
+	 * Offset of the low bit of the Link bit.
+	 */
+	private static final int L_LOW_BIT = 11;
+	/**
+	 * Offset of the high bit of the Link bit.
+	 */
+	private static final int L_HI_BIT = 12;
+
 	@Override
 	public void execute(int instruction, MachineState state, MemoryBank memory) {
+		int pc = state.programCounter;
+		// extract the base register.
+		int baseRegister = ByteOperations.extractValue(instruction,
+				BASE_LOW_BIT, BASE_HI_BIT);
+		// extract the page offset
+		int index = ByteOperations.extractValue(instruction, INDEX_LOW_BIT,
+				INDEX_HI_BIT);
+		int linkBit = ByteOperations.extractValue(instruction, L_LOW_BIT,
+				L_HI_BIT);
+		// Set register seven equal to the incoming program counter if link bit
+		// is set
+		if (linkBit == 1) {
+			state.registers[7] = (short) pc;
+		}
+		index = index & ZERO_MASK;
+		state.programCounter = (memory.read(state.registers[baseRegister] + index));
 	}
 }
