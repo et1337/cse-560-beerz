@@ -124,7 +124,7 @@ public class AndTest {
 		state.registers[1] = -0x6EF;
 		new  AndHandler().execute(0x586D, this.state, this.bank);
 		assertEquals("Should equal 1", 0x1, this.state.registers[4]);
-		assertEquals("Negative ccr should be set", this.state.ccrNegative, true);
+		assertEquals("Positive ccr should be set", this.state.ccrPositive, true);
 		
 	}
 	 /**
