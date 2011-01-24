@@ -24,6 +24,7 @@ public class TrapHandler extends InstructionHandler {
 	 */
 	@Override
 	public void execute(int instruction, MachineState state, MemoryBank memory) {
+		int pc = state.programCounter;
 		int trapVector = ByteOperations.extractValue(instruction, 0, 8);
 		int inputValue = 0;
 		switch (trapVector) {
@@ -41,14 +42,18 @@ public class TrapHandler extends InstructionHandler {
 			state.registers[0] = (short) RND.nextInt();
 			if (state.registers[0] == 0) {
 				state.ccrZero = true;
+				state.ccrPositive = false;
+				state.ccrNegative = false;
 			} else {
 				if (state.registers[0] > 0) {
 					state.ccrPositive = true;
 					state.ccrZero = false;
+					state.ccrNegative = false;
 				} else {
 					if (state.registers[0] < 0) {
 						state.ccrNegative = true;
 						state.ccrZero = false;
+						state.ccrPositive = false;
 					}
 				}
 			}
@@ -74,6 +79,21 @@ public class TrapHandler extends InstructionHandler {
 			}
 			inputValue = ByteOperations.extractValue(inputValue, 0, 8);
 			state.registers[0] = (short) inputValue;
+			if (state.registers[0] == 0) {
+				state.ccrZero = true;
+				state.ccrPositive = false;
+				state.ccrNegative = false;
+			} else {
+				if (state.registers[0] > 0){
+					state.ccrNegative = false;;
+					state.ccrPositive = true;
+					state.ccrZero = false;
+				} else {
+					state.ccrNegative = true;
+					state.ccrPositive = false;
+					state.ccrZero = false;
+				}
+			}
 			break;
 		case 0x33:
 			System.out.print("d? ");
@@ -96,9 +116,26 @@ public class TrapHandler extends InstructionHandler {
 			}
 
 			state.registers[0] = (short) number;
+			if (state.registers[0] == 0) {
+				state.ccrZero = true;
+				state.ccrPositive = false;
+				state.ccrNegative = false;
+			} else {
+				if (state.registers[0] > 0){
+					state.ccrNegative = false;;
+					state.ccrPositive = true;
+					state.ccrZero = false;
+				} else {
+					state.ccrNegative = true;
+					state.ccrPositive = false;
+					state.ccrZero = false;
+				}
+			}
 			System.out.println();
 			System.out.println(state.registers[0]);
 			break;
 		}
+		state.programCounter = pc;
 	}
+	
 }
