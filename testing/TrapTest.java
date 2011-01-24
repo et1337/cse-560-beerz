@@ -30,9 +30,52 @@ public class TrapTest {
 		state = new MachineState();
 	}
 	
+	@Test
+	public void innTest() {
+		//Type 32760 in console
+		new TrapHandler().execute(0xF033, this.state, this.bank);
+		assertEquals("Register 0 should hold 32760", 111, this.state.registers[0]);
+		
+		//Type -32768 in console
+		new TrapHandler().execute(0xF033, this.state, this.bank);
+		assertEquals("Register 0 should hold -32768", -32768, this.state.registers[0]);
+		
+		//Type 0 in console
+		//new TrapHandler().execute(0xF033, this.state, this.bank);
+		assertEquals("Register 0 should hold 0", 0, this.state.registers[0]);
+		
+	}
+
 	/**
-	 * Test the halt trap vector.
+	 * Tests the in trap vector.
 	 */
+
+	@Test
+	public void inTest() {
+		//Type 'E' in the console
+		new TrapHandler().execute(0xF023, this.state, this.bank);
+		assertEquals("Register 0 should equal the integer value of 'E'", 0x45, state.registers[0]);
+		
+		//Type 'v' in the console
+		new TrapHandler().execute(0xF023, this.state, this.bank);
+		assertEquals("Register 0 should equal the integer value of 'v'", 0x76, state.registers[0]);
+		
+		//Type '#' in the console
+		new TrapHandler().execute(0xF023, this.state, this.bank);
+		assertEquals("Register 0 should equal the integer value of '#'", 0x23, state.registers[0]);
+		
+		//Type '8' in the console
+		new TrapHandler().execute(0xF023, this.state, this.bank);
+		assertEquals("Register 0 should equal the integer value of '8'", 0x38, state.registers[0]);
+		
+	}
+	
+
+	
+	/**
+	 * Tests the halt trap vector.
+	 */
+	
 	@Test
 	public void haltTest() {
 		new TrapHandler().execute(0xf025, this.state, this.bank);
@@ -126,5 +169,7 @@ public class TrapTest {
 			cycles--;
 		}
 	}
+	
+
 	
 }
