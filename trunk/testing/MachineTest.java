@@ -23,7 +23,9 @@ public class MachineTest extends TestBase {
 	public void setUp() {
 		bank = new MemoryBank();
 	}
-	
+	 /**
+	  * Tests the Machine with a program.
+	  */
 	@Test
 	public void machineTest1() {
 		this.bank.write(0x3000, (short) 0x221A);
@@ -60,8 +62,4 @@ public class MachineTest extends TestBase {
 		assertEquals("Memory location 0x300A should hold -1", -1, state.registers[1]);
 	}
 	
-	@Test
-	public void machineTest2() {
-		
-	}
 }
