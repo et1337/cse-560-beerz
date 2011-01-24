@@ -26,31 +26,35 @@ public class JumpSubroutineRegisterTest {
 		bank = new MemoryBank();
 		state = new MachineState();
 		this.state.programCounter = 0x3000;
+		bank.write(0x120d, (short)0x45D3);
+		bank.write(0x2035, (short) 0x1920);
+		bank.write(0x5025, (short) 0x1002);
+		bank.write(0x700F, (short) 0x4343);
 	}
 	
 	@Test
 	public void jumpRegLTest(){
 		this.state.registers[1] = 0x2000;
-		new JumpSubroutineRegisterHandler().execute(0xC846, this.state, this.bank);
-		assertEquals("Program Counter should equal 0x2036", 0x2036, this.state.programCounter);
+		new JumpSubroutineRegisterHandler().execute(0xC875, this.state, this.bank);
+		assertEquals("Program Counter should equal 0x1920", 0x1920, this.state.programCounter);
 		assertEquals("Register 7 should equal 0x3000", 0x3000, this.state.registers[7]);
 		
 		this.state.registers[6] = 0x1200;
 		new JumpSubroutineRegisterHandler().execute(0xC98D, this.state, this.bank);
-		assertEquals("Program Counter should equal 0x120D", 0x120D, this.state.programCounter);
-		assertEquals("Register 7 should equal 0x2030", 0x2030, this.state.registers[7]);		
+		assertEquals("Program Counter should equal 0x120D", 0x45D3, this.state.programCounter);
+		assertEquals("Register 7 should equal 0x1920", 0x1920, this.state.registers[7]);		
 	}
 	
 	@Test
 	public void jumpRegNoLTest() {
 		this.state.registers[1] = 0x500D;
-		new JumpSubroutineRegisterHandler().execute(0xC07F, this.state, this.bank);
-		assertEquals("Program Counter should equal 0x507F", 0x507F, this.state.programCounter);
+		new JumpSubroutineRegisterHandler().execute(0xC058, this.state, this.bank);
+		assertEquals("Program Counter should equal 0x1002", 0x1002, this.state.programCounter);
 		assertEquals("Register 7 should be empty", 0x0, this.state.registers[7]);
 		
-		this.state.registers[1] = 0x7000;
+		this.state.registers[0] = 0x7000;
 		new JumpSubroutineRegisterHandler().execute(0xC00F, this.state, this.bank);
-		assertEquals("Program Counter should equal 0x700F", 0x700F, this.state.programCounter);
+		assertEquals("Program Counter should equal 0x4343", 0x4343, this.state.programCounter);
 		assertEquals("Register 7 should be empty", 0x0, this.state.registers[7]);
 	}
 }
