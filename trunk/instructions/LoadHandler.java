@@ -4,6 +4,7 @@ import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
 import java.io.PrintStream;
+import java.io.InputStream;
 
 /**
  * Handles a certain type of instruction.
@@ -42,7 +43,7 @@ public class LoadHandler extends InstructionHandler {
 	private static final int SHIFT = 9;
 
 	@Override
-	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
+	public void execute(PrintStream output, InputStream input, int instruction, MachineState state, MemoryBank memory) {
 		//get the value in the pc
 		int pc = state.programCounter;
 		// extract destination register
@@ -57,21 +58,7 @@ public class LoadHandler extends InstructionHandler {
 		pc = pc + pgOffset;
 		state.registers[destRegister] = memory.read(pc);
 		//update the CCR base on the contents of the destination register
-		if (state.registers[destRegister] == 0) {
-			state.ccrZero = true;
-			state.ccrNegative = false;
-			state.ccrPositive = false;
-		} else {
-			if (state.registers[destRegister] > 0) {
-				state.ccrZero = false;
-				state.ccrNegative = false;
-				state.ccrPositive = true;
-			} else {
-				state.ccrZero = false;
-				state.ccrNegative = true;
-				state.ccrPositive = false;
-			}
-		}
+		state.updateCcr(state.registers[destRegister]);
 	}
 	
 	@Override

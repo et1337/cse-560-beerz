@@ -1,3 +1,4 @@
+package testing;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -5,6 +6,8 @@ import state.MemoryBank;
 import state.MachineState;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import program.Machine;
+import program.ExecutionMode;
 
 public class MachineTest extends TestBase {
 	/**
@@ -43,7 +46,7 @@ public class MachineTest extends TestBase {
 		this.bank.write(0x301F, (short) 0x0043);
 		
 		// Initialize the machine with a null output stream
-		machine = new Machine(TestBase.nullStream, bank);
+		machine = new Machine(TestBase.nullOutStream, bank);
 		
 		try {
 			machine.run(0x3000, ExecutionMode.QUIET);

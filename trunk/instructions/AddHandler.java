@@ -4,6 +4,7 @@ import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
 import java.io.PrintStream;
+import java.io.InputStream;
 
 /**
  * Handles a certain type of instruction.
@@ -71,7 +72,7 @@ public class AddHandler extends InstructionHandler {
 	private static final int SIGN_EXTEND = 0xFFF0;
 
 	@Override
-	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
+	public void execute(PrintStream output, InputStream input, int instruction, MachineState state, MemoryBank memory) {
 		//extract destination register
 		int destRegister = ByteOperations.extractValue(instruction,
 				DEST_LOW_BIT, DEST_HI_BIT);
@@ -98,21 +99,7 @@ public class AddHandler extends InstructionHandler {
 
 		}
 		//update the CCR base on the contents of the destination register
-		if (state.registers[destRegister] == 0) {
-			state.ccrZero = true;
-			state.ccrNegative = false;
-			state.ccrPositive = false;
-		} else {
-			if (state.registers[destRegister] > 0) {
-				state.ccrZero = false;
-				state.ccrNegative = false;
-				state.ccrPositive = true;
-			} else {
-				state.ccrZero = false;
-				state.ccrNegative = true;
-				state.ccrPositive = false;
-			}
-		}
+		state.updateCcr(state.registers[destRegister]);
 	}
 	
 	@Override

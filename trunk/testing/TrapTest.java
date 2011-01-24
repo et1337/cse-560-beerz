@@ -36,83 +36,79 @@ public class TrapTest extends TestBase {
 	@Test
 	public void innTest() {
 		//Type 111 in console
-		new TrapHandler().execute(0xF033, this.state, this.bank);
+		new TrapHandler().execute("111\r\n", 0xF033, this.state, this.bank);
 		assertEquals("Register 0 should hold 111", 111, this.state.registers[0]);
 		assertEquals("The CCRs should be set to only positive", true, this.state.ccrPositive);
 		
 		//Type -32768 in console
-		new TrapHandler().execute(0xF033, this.state, this.bank);
+		new TrapHandler().execute("-32768\r\n", 0xF033, this.state, this.bank);
 		assertEquals("Register 0 should hold -32768", -32768, this.state.registers[0]);
 		assertEquals("The CCR should be set to only negative", true, this.state.ccrNegative);
 		
 		//Type 0 in console
-		new TrapHandler().execute(0xF033, this.state, this.bank);
+		new TrapHandler().execute("0\r\n", 0xF033, this.state, this.bank);
 		assertEquals("Register 0 should hold 0", 0, this.state.registers[0]);
 		assertEquals("The CCR should be set to only zero", true, this.state.ccrZero);
-		
 	}
 
 	/**
 	 * Tests the in trap vector.
 	 */
-
 	@Test
 	public void inTest() {
 		//Type 'E' in the console
-		new TrapHandler().execute(0xF023, this.state, this.bank);
+		new TrapHandler().execute("E\r\n", 0xF023, this.state, this.bank);
 		assertEquals("Register 0 should equal the integer value of 'E'", 0x45, state.registers[0]);
 		assertEquals("CCR should be set to positive", true, this.state.ccrPositive);
 		
 		//Type 'v' in the console
-		new TrapHandler().execute(0xF023, this.state, this.bank);
+		new TrapHandler().execute("v\r\n", 0xF023, this.state, this.bank);
 		assertEquals("Register 0 should equal the integer value of 'v'", 0x76, state.registers[0]);
 		
 		//Type '#' in the console
-		new TrapHandler().execute(0xF023, this.state, this.bank);
+		new TrapHandler().execute("#\r\n", 0xF023, this.state, this.bank);
 		assertEquals("Register 0 should equal the integer value of '#'", 0x23, state.registers[0]);
 		
 		//Type '8' in the console
-		new TrapHandler().execute(0xF023, this.state, this.bank);
+		new TrapHandler().execute("8\r\n", 0xF023, this.state, this.bank);
 		assertEquals("Register 0 should equal the integer value of '8'", 0x38, state.registers[0]);
-		
 	}
-	
-
 	
 	/**
 	 * Tests the halt trap vector.
 	 */
-	
 	@Test
 	public void haltTest() {
 		new TrapHandler().execute(0xf025, this.state, this.bank);
 		assertEquals("Trap - halt", this.state.executing, false);
 	}
-	 /**
-	  * Tests the out vector.
-	  */
+	
+	/**
+	 * Tests the out vector.
+	 */
 	@Test
 	public void outTest() {
 		//Should output the letter 'A'
 		this.state.registers[0] = 0x41;
-		new TrapHandler().execute(0xF021, this.state, this.bank);
+		assertEquals("Should output the letter 'A'", new TrapHandler().execute(0xF021, this.state, this.bank), "A");
 		
 		//Should output the letter 'z'
 		this.state.registers[0] = 0x7A;
-		new TrapHandler().execute(0xF021, this.state, this.bank);
+		assertEquals("Should output the letter 'z'", new TrapHandler().execute(0xF021, this.state, this.bank), "z");
 		
 		//Should output the character '!'
 		this.state.registers[0] = 0x21;
-		new TrapHandler().execute(0xF021, this.state, this.bank);
+		assertEquals("Should output the character '!'", new TrapHandler().execute(0xF021, this.state, this.bank), "!");
 	}
-	 /**
-	  * Tests the puts vector.
-	  */
+	
+	/**
+	 * Tests the puts vector.
+	 */
 	@Test
 	public void putsTest() {
-		//Should print out "\nTest Message 1?"
+		//Should print out "Test Message 1?"
 		this.state.registers[0] = 0x4000;
-		this.bank.write(0x4000, (short) 0x0D); //(new line)
+		this.bank.write(0x4000, (short) 0x0A); //Newline
 		this.bank.write(0x4001, (short) 0x54); //T
 		this.bank.write(0x4002, (short) 0x65); //e
 		this.bank.write(0x4003, (short) 0x73); //s
@@ -131,40 +127,29 @@ public class TrapTest extends TestBase {
 		this.bank.write(0x4010, (short) 0x00); //null
 		this.bank.write(0x4011, (short) 0x23); //#
 		this.bank.write(0x4012, (short) 0x26); //&
-		new TrapHandler().execute(0xF022, this.state, this.bank);	
+		assertEquals("Should print out \"\\nTest Message 1?\"", new TrapHandler().execute(0xF022, this.state, this.bank), "\nTest Message 1?");	
 	}
-	 /**
-	  * Tests the outn vector.
-	  */
+	
+	/**
+	 * Tests the outn vector.
+	 */
 	@Test
-	public void outnTest() {
-		//Print new line to separate output
-		this.state.registers[0] = 0x0D;
-		new TrapHandler().execute(0xF021, this.state, this.bank);
-		
+	public void outnTest() {		
 		//Should output -2
 		this.state.registers[0] = (short) 0xFFFE;
-		new TrapHandler().execute(0xF031, this.state, this.bank);
-		
-		//Print new line to separate output
-		this.state.registers[0] = 0x0D;
-		new TrapHandler().execute(0xF021, this.state, this.bank);
+		assertEquals("Should output -2", new TrapHandler().execute(0xF031, this.state, this.bank), "-2");
 		
 		//Should output 32767
 		this.state.registers[0] = (short) 0x7FFF;
-		new TrapHandler().execute(0xF031, this.state, this.bank);
-		
-		//Print new line to separate output
-		this.state.registers[0] = 0x0D;
-		new TrapHandler().execute(0xF021, this.state, this.bank);
+		assertEquals("Should output 32767", new TrapHandler().execute(0xF031, this.state, this.bank), "32767");
 		
 		//Should output 0
 		this.state.registers[0] = (short) 0x0;
-		new TrapHandler().execute(0xF031, this.state, this.bank);
+		assertEquals("Should output 0", new TrapHandler().execute(0xF031, this.state, this.bank), "0");
 	}
-	 /**
-	  * Tests the rnd vector.
-	  */
+	/**
+	 * Tests the rnd vector.
+	 */
 	@Test
 	public void rndTest() {
 		int cycles = 10;
