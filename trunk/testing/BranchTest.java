@@ -5,7 +5,11 @@ import org.junit.Test;
 import state.MemoryBank;
 import state.MachineState;
 import instructions.BranchHandler;
-
+/**
+ * Tests the Branch instruction.
+ *
+ *
+ */
 public class BranchTest extends TestBase {
 	/**
 	 * Contains the initial state of the memory used for testing.
@@ -32,13 +36,18 @@ public class BranchTest extends TestBase {
 		this.state.registers[5] = 0x7FFF;
 		
 	}
-	
+	/**
+	 * Tests the always branch condition.
+	 */
 	@Test
 	public void alwaysBranch() {
 		new BranchHandler().execute(0x0EA2, this.state, this.bank);
 		assertEquals ("Program counter should be incremented by 0xA2", 0x30A2, this.state.programCounter);
 	}
 	
+	/**
+	 * Tests the never branch condition.
+	 */
 	
 	@Test
 	public void nopBranch() {
@@ -46,6 +55,9 @@ public class BranchTest extends TestBase {
 		assertEquals("Program counter should not increment", 0x3000, this.state.programCounter);
 	}
 	
+	/**
+	 * Tests the positive branch condition.
+	 */
 	@Test
 	public void positiveBranch() {
 		this.state.ccrPositive = true;
@@ -64,7 +76,9 @@ public class BranchTest extends TestBase {
 		new BranchHandler().execute(0x082B, this.state, this.bank);
 		assertEquals("Program counter should not be incremented (no branch)", 0x3000, this.state.programCounter);
 	}
-	
+	 /**
+	  * Tests the negative branch condition.
+	  */
 	@Test
 	public void negativeBranch() {
 		this.state.ccrNegative = true;
@@ -80,7 +94,9 @@ public class BranchTest extends TestBase {
 		assertEquals("Program counter be incremented by 0x2B)", 0x302B, this.state.programCounter);
 	
 	}
-	
+	 /**
+	  * Tests the zero branch condition.
+	  */
 	@Test
 	public void zeroBranch() {
 		this.state.ccrZero = true;
@@ -90,5 +106,52 @@ public class BranchTest extends TestBase {
 		this.state.programCounter = 0x3000;
 		new BranchHandler().execute(0x0203, this.state, this.bank);
 		assertEquals("This counter should not be incremented", 0x3000, this.state.programCounter);
+	}
+	
+	/**
+	 * Tests the greater than or equal to zero condition.
+	 */
+	@Test
+	public void greaterThanEqualZeroTest() {
+		this.state.ccrPositive = true;
+		new BranchHandler().execute(0x06F0, this.state, this.bank);
+		assertEquals("The counter should be incremented by 0xF0", 0x30F0, this.state.programCounter);
+		
+		this.state.programCounter = 0x3000;
+		this.state.ccrZero = true;
+		this.state.ccrPositive = false;
+		new BranchHandler().execute(0x06F0, this.state, this.bank);
+		assertEquals("The counter should be incremented by 0xF0", 0x30F0, this.state.programCounter);
+	}
+	 /**
+	  * Tests the not equal to zero condition.
+	  */
+	@Test
+	public void notEqualZeroTest() {
+		this.state.ccrNegative = true;
+		new BranchHandler().execute(0x0A02, this.state, this.bank);
+		assertEquals("The counter should be incremented by 0x02", 0x3002, this.state.programCounter);
+		
+		this.state.programCounter = 0x3000;
+		this.state.ccrPositive = true;
+		this.state.ccrNegative = false;
+		new BranchHandler().execute(0x0A02, this.state, this.bank);
+		assertEquals("The counter should be incremented by 0x02", 0x3002, this.state.programCounter);
+	}
+	 /**
+	  * Tests the less than or equal to zero condition.
+	  */
+	@Test
+	public void lessThanEqualZeroTest() {
+		new BranchHandler().execute(0x0C10, this.state, this.bank);
+		assertEquals("The program counter should be incremented by 0x10", 0x3010, this.state.programCounter);
+		
+		this.state.programCounter = 0x3000;
+		this.state.ccrNegative = true;
+		this.state.ccrZero = false;
+		
+		new BranchHandler().execute(0x0C10, this.state, this.bank);
+		assertEquals("The program counter should be incremented by 0x10", 0x3010, this.state.programCounter);
+
 	}
 }
