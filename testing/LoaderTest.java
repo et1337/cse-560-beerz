@@ -1,7 +1,9 @@
+package testing;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import state.MemoryBank;
+import program.Loader;
 
 /**
  * Tests the Loader component of the machine.

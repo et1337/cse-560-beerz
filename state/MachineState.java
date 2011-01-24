@@ -39,8 +39,15 @@ public class MachineState {
 	 */
 	public short[] registers = new short[MachineState.NUM_REGISTERS];
 	
+	/**
+	 * Represents the program counter register.
+	 */
 	public int programCounter;
 	
+	/**
+	 * Gets a copy of this MachineState.
+	 * @return A copy of this MachineState.
+	 */
 	public MachineState clone() {
 		MachineState x = new MachineState();
 		x.ccrNegative = this.ccrNegative;
@@ -52,6 +59,35 @@ public class MachineState {
 			x.registers[i] = this.registers[i];
 		}
 		return x;
+	}
+	
+	/**
+	 * Updates the CCR register in accordance with the given signed 16-bit value.
+	 * If the value is zero, only the zero bit will be on.
+	 * If the value is positive, only the positive bit will be on.
+	 * If the value is negative, only the negative bit will be on.
+	 * @param value The signed 16-bit value to use when updating the CCR.
+	 */
+	public void updateCcr(short value) {
+		if (value == 0) {
+			this.ccrZero = true;
+			this.ccrPositive = false;
+			this.ccrNegative = false;
+		}
+		else {
+			if (value > 0) {
+				this.ccrPositive = true;
+				this.ccrZero = false;
+				this.ccrNegative = false;
+			}
+			else {
+				if (value < 0) {
+					this.ccrNegative = true;
+					this.ccrZero = false;
+					this.ccrPositive = false;
+				}
+			}
+		}
 	}
 	
 	/**

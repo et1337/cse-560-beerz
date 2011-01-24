@@ -3,6 +3,7 @@ import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
 import java.io.PrintStream;
+import java.io.InputStream;
 /**
  * Handles a certain type of instruction.
  */
@@ -35,7 +36,7 @@ public class StoreImmediateHandler extends InstructionHandler {
 	private static final int SHIFT = 9;
 	
 	@Override
-	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
+	public void execute(PrintStream output, InputStream input, int instruction, MachineState state, MemoryBank memory) {
 		// Get current program counter value
 		int pc = state.programCounter;
 		

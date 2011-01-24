@@ -3,6 +3,7 @@ import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
 import java.io.PrintStream;
+import java.io.InputStream;
 /**
  * Handles a certain type of instruction.
  */
@@ -44,7 +45,7 @@ public class JumpSubroutineImmediateHandler extends InstructionHandler {
 	 * store the current program counter in register seven, then
 	 * set the program counter to the page offset.
 	 */
-	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
+	public void execute(PrintStream output, InputStream input, int instruction, MachineState state, MemoryBank memory) {
 		int pc = state.programCounter;
 		int pgOffset = ByteOperations.extractValue(instruction, PG_LOW_BIT, PG_HI_BIT);
 		int linkBit = ByteOperations.extractValue(instruction, L_LOW_BIT, L_HI_BIT);

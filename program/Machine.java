@@ -1,3 +1,4 @@
+package program;
 import java.io.PrintStream;
 import instructions.InstructionMappings;
 import state.MachineState;

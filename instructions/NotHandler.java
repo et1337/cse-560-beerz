@@ -3,6 +3,7 @@ import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
 import java.io.PrintStream;
+import java.io.InputStream;
 /**
  * Handles a certain type of instruction.
  */
@@ -32,31 +33,17 @@ public class NotHandler extends InstructionHandler {
 	
 
 	@Override
-	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
-//extract destination register
+	public void execute(PrintStream output, InputStream input, int instruction, MachineState state, MemoryBank memory) {
+		//extract destination register
 		int destRegister = ByteOperations.extractValue(instruction,
 				DEST_LOW_BIT, DEST_HI_BIT);
-//extract the  source register
+		//extract the  source register
 		int src1Register = ByteOperations.extractValue(instruction,
 				SRC1_LOW_BIT, SRC1_HI_BIT);
-//perform the logical not operation
+		//perform the logical not operation
 		state.registers[destRegister] = (short) (~state.registers[src1Register]);
-//update the CCR base on the contents of the destination register
-		if (state.registers[destRegister] == 0) {
-			state.ccrZero = true;
-			state.ccrNegative = false;
-			state.ccrPositive = false;
-		} else {
-			if (state.registers[destRegister] > 0) {
-				state.ccrZero = false;
-				state.ccrNegative = false;
-				state.ccrPositive = true;
-			} else {
-				state.ccrZero = false;
-				state.ccrNegative = true;
-				state.ccrPositive = false;
-			}
-		}
+		//update the CCR base on the contents of the destination register
+		state.updateCcr(state.registers[destRegister]);
 	}
 	
 	@Override

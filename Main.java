@@ -3,6 +3,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.PrintStream;
 import state.MemoryBank;
+import program.Loader;
+import program.Machine;
+import program.ExecutionMode;
 
 public class Main {
 	/**

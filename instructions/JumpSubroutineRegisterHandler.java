@@ -4,6 +4,7 @@ import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
 import java.io.PrintStream;
+import java.io.InputStream;
 
 /**
  * Handles a certain type of instruction.
@@ -49,7 +50,7 @@ public class JumpSubroutineRegisterHandler extends InstructionHandler {
 	 */
 	private static final int REG = 7;
 	@Override
-	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
+	public void execute(PrintStream output, InputStream input, int instruction, MachineState state, MemoryBank memory) {
 		int pc = state.programCounter;
 		// extract the base register.
 		int baseRegister = ByteOperations.extractValue(instruction,

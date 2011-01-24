@@ -4,6 +4,7 @@ import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
 import java.io.PrintStream;
+import java.io.InputStream;
 
 /**
  * Handles a certain type of instruction.
@@ -77,7 +78,7 @@ public class BranchHandler extends InstructionHandler {
 	 * with the page offset specified by the instruction. 
 	 */
 	@Override
-	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
+	public void execute(PrintStream output, InputStream input, int instruction, MachineState state, MemoryBank memory) {
 		int pc = state.programCounter;
 		int branchCode = ByteOperations.extractValue(instruction, CCR_LOW_BIT,
 				CCR_HI_BIT);
@@ -85,73 +86,64 @@ public class BranchHandler extends InstructionHandler {
 		int pgOffset = ByteOperations.extractValue(instruction, PG_LOW_BIT,
 				PG_HI_BIT);
 		switch (branchCode) {
-		case 0:
-			break;
-		case BR_POS:
-			if (state.ccrPositive == true) {
-				pc = pc >> SHIFT;
-				pc = pc << SHIFT;
-				pc = pc + pgOffset;
-				state.programCounter = pc;
-			} else {
+			case 0:
 				break;
-			}
-		case BR_ZERO:
-			if (state.ccrZero == true) {
-				pc = pc >> SHIFT;
-				pc = pc << SHIFT;
-				pc = pc + pgOffset;
-				state.programCounter = pc;
-			} else {
+			case BR_POS:
+				if (state.ccrPositive == true) {
+					pc = pc >> SHIFT;
+					pc = pc << SHIFT;
+					pc = pc + pgOffset;
+					state.programCounter = pc;
+				}
 				break;
-			}
-		
-		case BR_NOT_NEG:
-			if (state.ccrPositive == true || state.ccrZero == true) {
-				pc = pc >> SHIFT;
-				pc = pc << SHIFT;
-				pc = pc + pgOffset;
-				state.programCounter = pc;
-			} else {
+			case BR_ZERO:
+				if (state.ccrZero == true) {
+					pc = pc >> SHIFT;
+					pc = pc << SHIFT;
+					pc = pc + pgOffset;
+					state.programCounter = pc;
+				}
 				break;
-			}
-		case BR_NEG:
-			if (state.ccrNegative == true) {
-				pc = pc >> SHIFT;
-				pc = pc << SHIFT;
-				pc = pc + pgOffset;
-				state.programCounter = pc;
-			} else {
+			case BR_NOT_NEG:
+				if (state.ccrPositive == true || state.ccrZero == true) {
+					pc = pc >> SHIFT;
+					pc = pc << SHIFT;
+					pc = pc + pgOffset;
+					state.programCounter = pc;
+				}
 				break;
-			}
-		case BR_NOT_ZERO:
-			if (state.ccrPositive == true || state.ccrNegative == true) {
-				pc = pc >> SHIFT;
-				pc = pc << SHIFT;
-				pc = pc + pgOffset;
-				state.programCounter = pc;
-			} else {
+			case BR_NEG:
+				if (state.ccrNegative == true) {
+					pc = pc >> SHIFT;
+					pc = pc << SHIFT;
+					pc = pc + pgOffset;
+					state.programCounter = pc;
+				}
 				break;
-			}
-		case BR_NOT_POS:
-			if (state.ccrNegative == true || state.ccrZero == true) {
-				pc = pc >> SHIFT;
-				pc = pc << SHIFT;
-				pc = pc + pgOffset;
-				state.programCounter = pc;
-			} else {
+			case BR_NOT_ZERO:
+				if (state.ccrPositive == true || state.ccrNegative == true) {
+					pc = pc >> SHIFT;
+					pc = pc << SHIFT;
+					pc = pc + pgOffset;
+					state.programCounter = pc;
+				}
 				break;
-			}
-		case BR_ALWAYS:
-			if (state.ccrPositive == true || state.ccrNegative == true || state.ccrZero == true) {
-				pc = pc >> SHIFT;
-				pc = pc << SHIFT;
-				pc = pc + pgOffset;
-				state.programCounter = pc;
-			} else {
+			case BR_NOT_POS:
+				if (state.ccrNegative == true || state.ccrZero == true) {
+					pc = pc >> SHIFT;
+					pc = pc << SHIFT;
+					pc = pc + pgOffset;
+					state.programCounter = pc;
+				}
 				break;
-			}
-			
+			case BR_ALWAYS:
+				if (state.ccrPositive == true || state.ccrNegative == true || state.ccrZero == true) {
+					pc = pc >> SHIFT;
+					pc = pc << SHIFT;
+					pc = pc + pgOffset;
+					state.programCounter = pc;
+				}
+				break;
 		}
 	}
 	

@@ -3,6 +3,7 @@ import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
 import java.io.PrintStream;
+import java.io.InputStream;
 /**
  * Handles a certain type of instruction.
  */
@@ -42,7 +43,7 @@ public class StoreRegisterHandler extends InstructionHandler {
 	private static final int ZERO_MASK = 0x003F;
 	
 	@Override
-	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
+	public void execute(PrintStream output, InputStream input, int instruction, MachineState state, MemoryBank memory) {
 		// extract source register
 		int srcRegister = ByteOperations.extractValue(instruction,
 				SRC_LOW_BIT, SRC_HI_BIT);

@@ -3,6 +3,7 @@ import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
 import java.io.PrintStream;
+import java.io.InputStream;
 /**
  * Handles a certain type of instruction.
  */
@@ -20,7 +21,7 @@ public class DebugHandler extends InstructionHandler {
 	 * This method displays the contents of the program counter, registers and the ccr.
 	 */
 	@Override
-	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
+	public void execute(PrintStream output, InputStream input, int instruction, MachineState state, MemoryBank memory) {
 		StringBuffer registers = new StringBuffer();
 		StringBuffer registerLabels = new StringBuffer();
 		output.println("Registers:");

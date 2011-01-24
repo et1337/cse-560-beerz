@@ -5,6 +5,7 @@ import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
 import java.io.PrintStream;
+import java.io.InputStream;
 
 /**
  * Static class for mapping op codes to instructions.
@@ -120,6 +121,21 @@ public class InstructionMappings {
 		InstructionHandler handler = InstructionMappings.getHandler(opCode);
 		if(handler != null)
 			handler.execute(output, instruction, state, memory);
+		else
+			throw new Exception("Execution error: invalid op code 0x" + ByteOperations.getHex(opCode, 1) + ".");
+	}
+	
+	/**
+	 * Executes the given instruction, using and modifying the given MachineState and MemoryBank.
+	 * @param instruction The 16-bit instruction code to execute.
+	 * @param state The MachineState to use and modify.
+	 * @param memory The MemoryBank to use and modify.
+	 */
+	public static void execute(PrintStream output, InputStream input, int instruction, MachineState state, MemoryBank memory) throws Exception {
+		int opCode = InstructionMappings.getOpCode(instruction);
+		InstructionHandler handler = InstructionMappings.getHandler(opCode);
+		if(handler != null)
+			handler.execute(output, input, instruction, state, memory);
 		else
 			throw new Exception("Execution error: invalid op code 0x" + ByteOperations.getHex(opCode, 1) + ".");
 	}
