@@ -36,6 +36,7 @@ public class InstructionHandler {
 	/**
 	 * Executes the given instruction, manipulating the given MachineState accordingly.
 	 * @param output The IO stream to print any output to.
+	 * @param input The IO stream to retrieve user input from.
 	 * @param instruction The integer value of the instruction to execute, including the four op-code bits.
 	 * @param state The MachineState to use and modify when executing.
 	 * @param memory The MemoryBank to use and modify when executing.
@@ -44,7 +45,7 @@ public class InstructionHandler {
 	}
 	
 	/**
-	 * Convenience method that allows InstructionMappings to
+	 * Convenience method that allows InstructionMappings to execute the instruction with System.in for the input stream.
 	 * @param output The IO stream to print any output to.
 	 * @param instruction The integer value of the instruction to execute, including the four op-code bits.
 	 * @param state The MachineState to use and modify when executing.
@@ -55,8 +56,7 @@ public class InstructionHandler {
 	}
 	
 	/**
-	 * Convenience method that allows tests to execute the instruction without providing an output stream.
-	 * @param output The IO stream to print any output to.
+	 * Convenience method that allows tests to execute the instruction without providing an input or output stream.
 	 * @param instruction The integer value of the instruction to execute, including the four op-code bits.
 	 * @param state The MachineState to use and modify when executing.
 	 * @param memory The MemoryBank to use and modify when executing.
@@ -69,9 +69,9 @@ public class InstructionHandler {
 	}
 	
 	/**
-	 * Convenience method that allows tests to execute the instruction without providing an output stream.
+	 * Convenience method that allows tests to execute the instruction with user input.
 	 * Also allows tests to specify user input.
-	 * @param output The IO stream to print any output to.
+	 * @param input A string containing user input for the instruction. Input lines should be separated with \r\n.
 	 * @param instruction The integer value of the instruction to execute, including the four op-code bits.
 	 * @param state The MachineState to use and modify when executing.
 	 * @param memory The MemoryBank to use and modify when executing.

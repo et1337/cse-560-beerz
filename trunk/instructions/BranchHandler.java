@@ -7,7 +7,7 @@ import java.io.PrintStream;
 import java.io.InputStream;
 
 /**
- * Handles a certain type of instruction.
+ * Handles the Branch instruction.
  */
 public class BranchHandler extends InstructionHandler {
 	/**
