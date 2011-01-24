@@ -30,19 +30,25 @@ public class TrapTest {
 		state = new MachineState();
 	}
 	
+	/**
+	 * Tests the inn function.
+	 */
 	@Test
 	public void innTest() {
-		//Type 32760 in console
+		//Type 111 in console
 		new TrapHandler().execute(0xF033, this.state, this.bank);
-		assertEquals("Register 0 should hold 32760", 111, this.state.registers[0]);
+		assertEquals("Register 0 should hold 111", 111, this.state.registers[0]);
+		assertEquals("The CCRs should be set to only positive", true, this.state.ccrPositive);
 		
 		//Type -32768 in console
 		new TrapHandler().execute(0xF033, this.state, this.bank);
 		assertEquals("Register 0 should hold -32768", -32768, this.state.registers[0]);
+		assertEquals("The CCR should be set to only negative", true, this.state.ccrNegative);
 		
 		//Type 0 in console
-		//new TrapHandler().execute(0xF033, this.state, this.bank);
+		new TrapHandler().execute(0xF033, this.state, this.bank);
 		assertEquals("Register 0 should hold 0", 0, this.state.registers[0]);
+		assertEquals("The CCR should be set to only zero", true, this.state.ccrZero);
 		
 	}
 
@@ -55,6 +61,7 @@ public class TrapTest {
 		//Type 'E' in the console
 		new TrapHandler().execute(0xF023, this.state, this.bank);
 		assertEquals("Register 0 should equal the integer value of 'E'", 0x45, state.registers[0]);
+		assertEquals("CCR should be set to positive", true, this.state.ccrPositive);
 		
 		//Type 'v' in the console
 		new TrapHandler().execute(0xF023, this.state, this.bank);
