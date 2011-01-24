@@ -1,4 +1,6 @@
 package instructions;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import state.MachineState;
 import state.MemoryBank;
@@ -16,6 +18,7 @@ public class TrapHandler extends InstructionHandler {
 	@Override
 	public void execute(int instruction, MachineState state, MemoryBank memory) {
 		int trapVector = ByteOperations.extractValue(instruction, 0, 8);
+		int inputValue = 0;
 		switch (trapVector) {
 			case 0x25:
 				state.executing = false;
@@ -52,8 +55,50 @@ public class TrapHandler extends InstructionHandler {
 					
 				}
 				break;
+			case 0x23:
+				InputStreamReader reader = new InputStreamReader (System.in);
 				
+				System.out.print("? ");
+			try {
+				inputValue = reader.read();
+			} catch (IOException e) {
 				
+				e.printStackTrace();
+			}
+				inputValue = ByteOperations.extractValue(inputValue, 0, 8);
+				state.registers[0] = (short)inputValue;
+				break;
+			case 0x33:
+				System.out.print("d? ");
+				int number = 0;
+				   try {
+			            
+			            BufferedReader reader1 = new BufferedReader(new InputStreamReader(System.in));
+			            String input = reader1.readLine();
+			            
+			             number = Integer.parseInt(input);
+			            
+			            
+			           
+			            reader1.close();
+			            
+			        } catch (IOException e) {
+			            e.printStackTrace();
+			        } catch (NumberFormatException e) {
+			            System.out.println("Input by user was not a number.");
+			            e.printStackTrace();
+			        }	
+			/*try {
+				inputValue = System.in.read();
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			}*/
+				//int temp =  Integer.valueOf(inputValue);
+				state.registers[0] = (short)number;
+				System.out.println();
+				System.out.println(state.registers[0]);
+				break;
 		}
 	}
 }
