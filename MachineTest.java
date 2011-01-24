@@ -22,7 +22,7 @@ public class MachineTest {
 	}
 	
 	@Test
-	public void machineAddTest() {
+	public void machineTest1() {
 		this.bank.write(0x3000, (short) 0x221A);
 		this.bank.write(0x3001, (short) 0x201D);
 		this.bank.write(0x3002, (short) 0x5680);
@@ -48,6 +48,16 @@ public class MachineTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		MachineState state = machine.getState();
+		assertEquals("The CCR should be set to Positive", true, state.ccrPositive);
+		assertEquals("Register 0 should hold 0x43", 0x43, state.registers[0]);
+		assertEquals("Memory location 0x300A should hold -1", -1, state.registers[1]);
+		
+	}
+	
+	@Test
+	public void machineTest2() {
 		
 	}
 }
