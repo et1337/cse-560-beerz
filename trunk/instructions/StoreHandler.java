@@ -2,6 +2,7 @@ package instructions;
 import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
+import java.io.PrintStream;
 /**
  * Handles a certain type of instruction.
  */
@@ -32,8 +33,9 @@ public class StoreHandler extends InstructionHandler {
 	 * order bits.
 	 */
 	private static final int SHIFT = 9;
+	
 	@Override
-	public void execute(int instruction, MachineState state, MemoryBank memory) {
+	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
 		// Get current program counter value
 		int pc = state.programCounter;
 		
@@ -50,7 +52,10 @@ public class StoreHandler extends InstructionHandler {
 		
 		// Write value in source register to address formed above
 		memory.write(pc, state.registers[srcRegister]);
-		
-		
+	}
+	
+	@Override
+	public String getName() {
+		return "Store";
 	}
 }

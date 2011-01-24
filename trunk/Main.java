@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.PrintStream;
 import state.MemoryBank;
 
 public class Main {
@@ -10,35 +11,106 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		// Print usage data if necessary
-		if(args.length != 1 || args[0] == "--help") {
+		if (args.length < 1 || args[0].equals("--help")) {
 			Main.printUsageInformation();
 			return;
 		}
 		
-		// Path to the object file to load
-		String filename = args[0];
+		// Default run mode: quiet
+		ExecutionMode mode = ExecutionMode.QUIET;
 		
-		MemoryBank memory = new MemoryBank();
+		// IO stream for all program and trace output
+		PrintStream printStream = System.out;
 		
-		// Load all the file data into a string
-		String fileData = "";
 		try {
-			fileData = Main.readAllText(filename);
+			for (int i = 1; i < args.length; i++) {
+				if (args[i].equals("-o")) {
+					// Set up an output file
+					i++;
+					if(i < args.length) {
+						try {
+							printStream = new PrintStream(args[i]);
+						} catch (IOException e) {
+							System.out.println("Failed to open file \"" + args[i] + "\" for writing.");
+							return;
+						}
+					}
+					else {
+						Main.printUsageInformation();
+						return;
+					}
+				}
+				else if (args[i].equals("-r")) {
+					// Set the execution mode
+					i++;
+					if (i < args.length) {
+						String modeString = args[i].toLowerCase();
+						if (modeString.equals("quiet")) {
+							mode = ExecutionMode.QUIET;
+						}
+						else if (modeString.equals("trace")) {
+							mode = ExecutionMode.TRACE;
+						}
+						else if (modeString.equals("step")) {
+							mode = ExecutionMode.STEP;
+						}
+						else {
+							Main.printUsageInformation();
+							return;
+						}
+					}
+					else {
+						Main.printUsageInformation();
+						return;
+					}
+				}
+				else {
+					Main.printUsageInformation();
+					return;
+				}
+			}
+			
+			// Don't let the user try to run in step mode and use an output file.
+			// They would have a blank screen waiting for them to press a key for each instruction.
+			if (printStream != System.out && mode == ExecutionMode.STEP) {
+				System.out.println("Executing in step mode with an output file is not allowed.");
+				return;
+			}
+			
+			// Path to the object file to load
+			String filename = args[0];
+			
+			// Load all the file data into a string
+			String fileData = "";
+			try {
+				fileData = Main.readAllText(filename);
+			}
+			catch (IOException e) {
+				System.out.println("Failed to open file \"" + filename + "\" for reading.");
+				return;
+			}
+			
+			
+			int startAddress = 0;
+			try {
+				// Load the file data into the memory bank
+				MemoryBank memory = new MemoryBank();
+				startAddress = Loader.load(fileData, memory);
+				
+				// Run it!
+				Machine machine = new Machine(printStream, memory);
+				machine.run(startAddress, mode);
+			}
+			catch (Exception e) {
+				e.printStackTrace(printStream);
+				return;
+			}
 		}
-		catch (IOException e) {
-			System.out.println("Failed to open file \"" + filename + "\" for reading.");
-		}
-		
-		// Load the file data into the memory bank
-		int startAddress = 0;
-		try {
-			startAddress = Loader.load(fileData, memory);
-			Machine machine = new Machine(memory);
-			machine.run(startAddress);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			return;
+		finally {
+			// No matter what happens, close our output stream if it's open.
+			if (printStream != System.out) {
+				printStream.close();
+			}
 		}
 	}
 	
@@ -46,7 +118,11 @@ public class Main {
 	 * Prints usage information for users of this program.
 	 */
 	private static void printUsageInformation() {
-		System.out.println("Usage: java Main filename");
+		System.out.println("Usage:\tjava Main inputfile [options]");
+		System.out.println("\t-o outputfile\tRedirect output to specified file.");
+		System.out.println("\t-r quiet\tRun the program in quiet mode.");
+		System.out.println("\t-r trace\tRun the program in trace mode.");
+		System.out.println("\t-r step\tRun the program in step mode.");
 	}
 	
 	/**

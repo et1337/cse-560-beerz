@@ -2,6 +2,7 @@ package instructions;
 import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
+import java.io.PrintStream;
 /**
  * Handles a certain type of instruction.
  */
@@ -41,7 +42,7 @@ public class LoadRegisterHandler extends InstructionHandler {
 	 */
 	private static final int ZERO_MASK = 0x003F;
 	@Override
-	public void execute(int instruction, MachineState state, MemoryBank memory) {
+	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
 		// extract destination register
 		int destRegister = ByteOperations.extractValue(instruction,
 				DEST_LOW_BIT, DEST_HI_BIT);
@@ -70,5 +71,10 @@ public class LoadRegisterHandler extends InstructionHandler {
 				state.ccrPositive = false;
 			}
 		}
+	}
+	
+	@Override
+	public String getName() {
+		return "Load Register";
 	}
 }

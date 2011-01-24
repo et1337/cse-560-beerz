@@ -2,6 +2,7 @@ package instructions;
 import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
+import java.io.PrintStream;
 /**
  * Handles a certain type of instruction.
  */
@@ -31,7 +32,7 @@ public class LoadImmediateHandler extends InstructionHandler {
 	private static final int SHIFT = 9;
 
 	@Override
-	public void execute(int instruction, MachineState state, MemoryBank memory) {
+	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
 		//get the value in the pc
 		int pc = state.programCounter;
 		// extract destination register
@@ -61,5 +62,10 @@ public class LoadImmediateHandler extends InstructionHandler {
 				state.ccrPositive = false;
 			}
 		}
+	}
+	
+	@Override
+	public String getName() {
+		return "Load Immediate";
 	}
 }

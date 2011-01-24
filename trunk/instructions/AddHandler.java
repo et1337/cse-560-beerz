@@ -3,6 +3,7 @@ package instructions;
 import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
+import java.io.PrintStream;
 
 /**
  * Handles a certain type of instruction.
@@ -70,14 +71,14 @@ public class AddHandler extends InstructionHandler {
 	private static final int SIGN_EXTEND = 0xFFF0;
 
 	@Override
-	public void execute(int instruction, MachineState state, MemoryBank memory) {
-//extract destination register
+	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
+		//extract destination register
 		int destRegister = ByteOperations.extractValue(instruction,
 				DEST_LOW_BIT, DEST_HI_BIT);
-//extract the 1st source register
+		//extract the 1st source register
 		int src1Register = ByteOperations.extractValue(instruction,
 				SRC1_LOW_BIT, SRC1_HI_BIT);
-//check to see if add is one source register or two source registers
+		//check to see if add is one source register or two source registers
 		if ((instruction & FLAG_BIT) == 0) {
 			//extract 2nd source register
 			int src2Register = ByteOperations.extractValue(instruction,
@@ -96,7 +97,7 @@ public class AddHandler extends InstructionHandler {
 			state.registers[destRegister] = (short) (state.registers[src1Register] + immediateValue);
 
 		}
-//update the CCR base on the contents of the destination register
+		//update the CCR base on the contents of the destination register
 		if (state.registers[destRegister] == 0) {
 			state.ccrZero = true;
 			state.ccrNegative = false;
@@ -112,5 +113,10 @@ public class AddHandler extends InstructionHandler {
 				state.ccrPositive = false;
 			}
 		}
+	}
+	
+	@Override
+	public String getName() {
+		return "Add";
 	}
 }

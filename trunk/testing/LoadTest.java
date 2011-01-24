@@ -13,7 +13,7 @@ import instructions.LoadHandler;
  * Tests the Load instruction and verifies that the proper CCRs are being set.
  *
  */
-public class LoadTest {
+public class LoadTest extends TestBase {
 
 
 	/**

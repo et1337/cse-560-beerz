@@ -3,9 +3,10 @@ import org.junit.Before;
 import org.junit.Test;
 import state.MemoryBank;
 import state.MachineState;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
-
-public class MachineTest {
+public class MachineTest extends TestBase {
 	/**
 	 * Initial state of memory.
 	 */
@@ -18,7 +19,6 @@ public class MachineTest {
 	@Before
 	public void setUp() {
 		bank = new MemoryBank();
-
 	}
 	
 	@Test
@@ -41,10 +41,12 @@ public class MachineTest {
 		this.bank.write(0x301D, (short) 0x40E2);
 		this.bank.write(0x301E, (short) 0x00CF);
 		this.bank.write(0x301F, (short) 0x0043);
-		machine = new Machine(bank);
+		
+		// Initialize the machine with a null output stream
+		machine = new Machine(TestBase.nullStream, bank);
 		
 		try {
-			machine.run(0x3000);
+			machine.run(0x3000, ExecutionMode.QUIET);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -53,7 +55,6 @@ public class MachineTest {
 		assertEquals("The CCR should be set to Positive", true, state.ccrPositive);
 		assertEquals("Register 0 should hold 0x43", 0x43, state.registers[0]);
 		assertEquals("Memory location 0x300A should hold -1", -1, state.registers[1]);
-		
 	}
 	
 	@Test

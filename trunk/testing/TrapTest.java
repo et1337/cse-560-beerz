@@ -9,7 +9,7 @@ import instructions.TrapHandler;
 /**
  * Tests the functionality of the Trap function.
  */
-public class TrapTest {
+public class TrapTest extends TestBase {
 
 	/**
 	 * Contains the initial state of the memory used for testing.
@@ -168,7 +168,7 @@ public class TrapTest {
 	@Test
 	public void rndTest() {
 		int cycles = 10;
-		while (cycles > 0){
+		while (cycles > 0) {
 			new TrapHandler().execute(0xF043, this.state, this.bank);
 			int reg0 = this.state.registers[0];
 			assertEquals("The random number should be greater than 0x8000", true, -0x8000 <= reg0);
@@ -176,7 +176,4 @@ public class TrapTest {
 			cycles--;
 		}
 	}
-	
-
-	
 }

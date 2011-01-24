@@ -13,7 +13,7 @@ import instructions.AddHandler;
  *
  */
 
-public class AddTest {
+public class AddTest extends TestBase {
 	
 	/**
 	 * Contains the initial state of the memory used for testing.

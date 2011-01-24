@@ -6,7 +6,7 @@ import state.MemoryBank;
 import state.MachineState;
 import instructions.LoadEffectiveAddressHandler;
 
-public class LoadEffectiveAddressTest {
+public class LoadEffectiveAddressTest extends TestBase {
 	/**
 	 * Contains the initial state of the memory used for testing.  Also, the CCRs are checked
 	 * to verify they are being set correctly.

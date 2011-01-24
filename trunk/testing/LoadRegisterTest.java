@@ -10,7 +10,7 @@ import instructions.LoadRegisterHandler;
   * @author Elliot
   * Tests the Load Register instruction and verifies that the proper CCRs are being set.
   */
-public class LoadRegisterTest {
+public class LoadRegisterTest extends TestBase {
 	/**
 	 * Contains the initial state of the memory used for testing.  Also, the CCRs are checked
 	 * to verify they are being set correctly.

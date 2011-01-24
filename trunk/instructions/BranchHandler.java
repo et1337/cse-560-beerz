@@ -3,6 +3,7 @@ package instructions;
 import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
+import java.io.PrintStream;
 
 /**
  * Handles a certain type of instruction.
@@ -68,21 +69,21 @@ public class BranchHandler extends InstructionHandler {
 	 * Value of branch always.
 	 */
 	private static final int BR_ALWAYS = 7;
-/**
- * This method extracts the branch code from the instruction and then compares it
- * to one of seven possible branch codes (the eight being a nop) and then modifes
- * the program counter by concatenating the upper 7 bits of the program counter
- * with the page offset specified by the instruction. 
- */
+	
+	/**
+	 * This method extracts the branch code from the instruction and then compares it
+	 * to one of seven possible branch codes (the eight being a nop) and then modifes
+	 * the program counter by concatenating the upper 7 bits of the program counter
+	 * with the page offset specified by the instruction. 
+	 */
 	@Override
-	public void execute(int instruction, MachineState state, MemoryBank memory) {
+	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
 		int pc = state.programCounter;
 		int branchCode = ByteOperations.extractValue(instruction, CCR_LOW_BIT,
 				CCR_HI_BIT);
 
 		int pgOffset = ByteOperations.extractValue(instruction, PG_LOW_BIT,
 				PG_HI_BIT);
-		// System.out.println(ccrN + " " + ccrZ + " " + ccrP);
 		switch (branchCode) {
 		case 0:
 			break;
@@ -152,7 +153,10 @@ public class BranchHandler extends InstructionHandler {
 			}
 			
 		}
-
 	}
-
+	
+	@Override
+	public String getName() {
+		return "Branch";
+	}
 }

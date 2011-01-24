@@ -2,6 +2,7 @@ package instructions;
 import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
+import java.io.PrintStream;
 /**
  * Handles a certain type of instruction.
  */
@@ -15,33 +16,34 @@ public class DebugHandler extends InstructionHandler {
 	 * Total number of registers.
 	 */
 	private static final int REG_COUNT = 8;
-	/**
-	 * Mask used to eliminate top 8 bits.
-	 */
-	private static final int HEX_MASK = 0x0000FFFF;
 	/** 
 	 * This method displays the contents of the program counter, registers and the ccr.
 	 */
 	@Override
-	public void execute(int instruction, MachineState state, MemoryBank memory) {
-	System.out.println("Progam Counter = 0x" + Integer.toHexString(state.programCounter & HEX_MASK).toUpperCase());
-		int n = 0;
-		int z = 0;
-		int p = 0;
+	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
+		StringBuffer registers = new StringBuffer();
+		StringBuffer registerLabels = new StringBuffer();
+		output.println("Registers:");
+		for (int i = 0; i < REG_COUNT; i++) {
+			registers.append("0x");
+			registers.append(ByteOperations.getHex(state.registers[i], 4));
+			registers.append(" ");
+			registerLabels.append("r");
+			registerLabels.append(i + 1);
+			registerLabels.append("     ");
+		}
+		output.println(registers.toString());
+		output.println(registerLabels.toString());
+		
+		int n = state.ccrNegative ? 1 : 0;
+		int z = state.ccrZero ? 1 : 0;
+		int p = state.ccrPositive ? 1 : 0;
+		output.println("0x" + ByteOperations.getHex(state.programCounter, 4) + " " + n + "      " + z + "      " + p);
+		output.println("PC     N      Z      P");
+	}
 	
-		for (int i = 0; i < REG_COUNT; i++) 
-		{
-			System.out.println("Register " + i + " = 0x" + Integer.toHexString(state.registers[i] & HEX_MASK).toUpperCase());
-		}
-		if (state.ccrNegative == true) {
-			n = 1;
-		}
-		if (state.ccrZero == true) {
-			z = 1;
-		}
-		if (state.ccrPositive == true) {
-			p = 1;
-		}
-		System.out.println("CCR: N = " + n + " Z = " + z + " P = " + p);
+	@Override
+	public String getName() {
+		return "Debug";
 	}
 }

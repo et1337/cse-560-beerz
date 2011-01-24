@@ -4,6 +4,7 @@ import java.util.HashMap;
 import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
+import java.io.PrintStream;
 
 /**
  * Static class for mapping op codes to instructions.
@@ -13,6 +14,16 @@ public class InstructionMappings {
 	 * Lookup table used to map instruction codes to handlers.
 	 */
 	private static Map<Integer, InstructionHandler> mappings = new HashMap<Integer, InstructionHandler>();
+	
+	/**
+	 * Location of the first op code bit in an instruction code.
+	 */
+	private static final int OP_CODE_START = 12;
+	
+	/**
+	 * Location of the last op code bit in an instruction code.
+	 */
+	private static final int OP_CODE_END = 16;
 	
 	// Note: the static initializer block must come *after* the definition of "mappings".
 	static {
@@ -70,7 +81,21 @@ public class InstructionMappings {
 	 * @return The integer value of the op code extracted from the given instruction.
 	 */
 	public static int getOpCode(int instruction) {
-		return ByteOperations.extractValue(instruction, 12, 16);
+		return ByteOperations.extractValue(instruction, InstructionMappings.OP_CODE_START, InstructionMappings.OP_CODE_END);
+	}
+	
+	/**
+	 * Gets the name of the instruction represented by the given op code.
+	 * Returns a blank string if no matching instruction is found.
+	 * @param opCode The op code to find the name of.
+	 * @return The name of the instruction represented by the given op code.
+	 */
+	public static String getInstructionName(int opCode) {
+		InstructionHandler handler = InstructionMappings.getHandler(opCode);
+		if (handler == null)
+			return "";
+		else
+			return handler.getName();
 	}
 	
 	/**
@@ -90,11 +115,11 @@ public class InstructionMappings {
 	 * @param state The MachineState to use and modify.
 	 * @param memory The MemoryBank to use and modify.
 	 */
-	public static void execute(int instruction, MachineState state, MemoryBank memory) throws Exception {
+	public static void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) throws Exception {
 		int opCode = InstructionMappings.getOpCode(instruction);
 		InstructionHandler handler = InstructionMappings.getHandler(opCode);
 		if(handler != null)
-			handler.execute(instruction, state, memory);
+			handler.execute(output, instruction, state, memory);
 		else
 			throw new Exception("Execution error: invalid op code 0x" + ByteOperations.getHex(opCode, 1) + ".");
 	}

@@ -3,6 +3,7 @@ package instructions;
 import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
+import java.io.PrintStream;
 
 /**
  * Handles a certain type of instruction.
@@ -48,7 +49,7 @@ public class JumpSubroutineRegisterHandler extends InstructionHandler {
 	 */
 	private static final int REG = 7;
 	@Override
-	public void execute(int instruction, MachineState state, MemoryBank memory) {
+	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
 		int pc = state.programCounter;
 		// extract the base register.
 		int baseRegister = ByteOperations.extractValue(instruction,
@@ -65,5 +66,10 @@ public class JumpSubroutineRegisterHandler extends InstructionHandler {
 		}
 		index = index & ZERO_MASK;
 		state.programCounter = (memory.read(state.registers[baseRegister] + index));
+	}
+	
+	@Override
+	public String getName() {
+		return "Jump Subroutine Register";
 	}
 }

@@ -6,7 +6,7 @@ import state.MemoryBank;
 import state.MachineState;
 import instructions.StoreRegisterHandler;
 
-public class StoreRegisterTest {
+public class StoreRegisterTest extends TestBase {
 	/**
 	 * Contains the initial state of the memory used for testing.
 	 */

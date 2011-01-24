@@ -6,7 +6,7 @@ import state.MemoryBank;
 import state.MachineState;
 import instructions.ReturnHandler;
 
-public class ReturnTest {
+public class ReturnTest extends TestBase {
 	/**
 	 * Contains the initial state of the memory used for testing.
 	 */

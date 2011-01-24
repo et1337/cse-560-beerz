@@ -11,7 +11,7 @@ import instructions.NotHandler;
   *
   * Tests the functionality of the Not function and that the CCRs are changed when necessary.
   */
-public class NotTest {
+public class NotTest extends TestBase {
 
 	/**
 	 * Contains the initial state of the memory used for testing.

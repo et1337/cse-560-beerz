@@ -1,6 +1,8 @@
+import java.io.PrintStream;
 import instructions.InstructionMappings;
 import state.MachineState;
 import state.MemoryBank;
+import util.ByteOperations;
 
 /**
  * This class represents a virtual machine capable of executing instructions stored in a MemoryBank.
@@ -34,11 +36,26 @@ public class Machine {
 	private MachineState state;
 	
 	/**
+	 * IO stream for displaying output.
+	 */
+	private PrintStream output;
+	
+	/**
+	 * Offset of the low bit of the page in the instruction.
+	 */
+	private static final int PG_LOW_BIT = 9;
+	/**
+	 * Offset of the high bit of the page in the instruction
+	 */
+	private static final int PG_HI_BIT = 16;
+	
+	/**
 	 * Creates a new virtual machine using the given MemoryBank.
 	 * @param _memory The MemoryBank to use to represent the machine's memory.
 	 */
-	public Machine(MemoryBank _memory) {
+	public Machine(PrintStream _output, MemoryBank _memory) {
 		this.memory = _memory;
+		this.output = _output;
 		this.state = new MachineState();
 	}
 	
@@ -46,10 +63,30 @@ public class Machine {
 	 * Begins quiet execution at the given address in memory.
 	 * @param startAddress The memory address to begin execution at.
 	 */
-	public void run(int startAddress) throws Exception {
+	public void run(int startAddress, ExecutionMode mode) throws Exception {
 		this.state.programCounter = startAddress;
+		int page = 0;
 		while (this.state.executing) {
-			this.execute(this.memory.read(this.state.programCounter));
+			page = ByteOperations.extractValue(this.state.programCounter, Machine.PG_LOW_BIT, Machine.PG_HI_BIT);
+			if (mode == ExecutionMode.TRACE || mode == ExecutionMode.STEP) {
+				this.memory.displayPage(this.output, page);
+				this.state.display(this.output);
+			}
+			
+			if (mode == ExecutionMode.STEP) {
+				System.in.read();
+			}
+		
+			int instruction = this.memory.read(this.state.programCounter);
+			if (mode == ExecutionMode.TRACE || mode == ExecutionMode.STEP) {
+				output.println("Executing instruction: " + InstructionMappings.getInstructionName(InstructionMappings.getOpCode(instruction)));
+			}
+			this.execute(instruction);
+			
+		}
+		if (mode == ExecutionMode.TRACE || mode == ExecutionMode.STEP) {
+			this.memory.displayPage(this.output, page);
+			this.state.display(this.output);
 		}
 	}
 	
@@ -58,7 +95,7 @@ public class Machine {
 	 */
 	private void execute(int instruction) throws Exception {
 		this.state.programCounter++;
-		InstructionMappings.execute(instruction, this.state, this.memory);
+		InstructionMappings.execute(this.output, instruction, this.state, this.memory);
 	}
 	
 	/**

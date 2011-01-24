@@ -9,7 +9,7 @@ import state.MemoryBank;
  *
  */
 
-public class LoaderTest {
+public class LoaderTest extends TestBase {
 	/**
 	 * Initial state of memory
 	 */
@@ -35,7 +35,6 @@ public class LoaderTest {
 			new Loader();
 			startaddress = Loader.load(instructions, bank);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
