@@ -32,7 +32,8 @@ public class LoaderTest {
 				"T300254A0\n" +
 				"E3000";
 		try {
-			startaddress = new Loader().load(instructions, bank);
+			new Loader();
+			startaddress = Loader.load(instructions, bank);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -50,6 +51,7 @@ public class LoaderTest {
 	@Test
 	public void loaderHeaderErrorTest(){
 		String instructions = new String();
+		@SuppressWarnings("unused")
 		int startaddress = 0;
 		boolean thrownError = false;
 		instructions = "BEEERZ30000003\n" +
@@ -59,7 +61,8 @@ public class LoaderTest {
 		"E3000";
 		
 		try {
-			startaddress = new Loader().load(instructions, bank);
+			new Loader();
+			startaddress = Loader.load(instructions, bank);
 		} catch (Exception e) {
 			thrownError = true;
 		}
@@ -72,6 +75,7 @@ public class LoaderTest {
 	@Test
 	public void loaderFooterErrorTest() {
 		String instructions = new String();
+		@SuppressWarnings("unused")
 		int startaddress = 0;
 		boolean thrownError = false;
 		instructions = "HBEEERZ30000003\n" +
@@ -80,7 +84,8 @@ public class LoaderTest {
 		"T300254A0\n";
 		
 		try{
-			startaddress = new Loader().load(instructions, bank);
+			new Loader();
+			startaddress = Loader.load(instructions, bank);
 		} catch (Exception e) {
 			thrownError = true;
 		}
@@ -93,6 +98,7 @@ public class LoaderTest {
 	@Test
 	public void loaderEntryErrorTest() {
 		String instructions = new String();
+		@SuppressWarnings("unused")
 		int startaddress = 0;
 		boolean thrownError = false;
 		instructions = "HBEEERZ30000003\n" +
@@ -102,7 +108,8 @@ public class LoaderTest {
 		"E3000";
 		 
 		try{
-			startaddress = new Loader().load(instructions, bank);
+			new Loader();
+			startaddress = Loader.load(instructions, bank);
 		} catch (Exception e) {
 			thrownError = true;
 		}
