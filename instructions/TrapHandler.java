@@ -6,6 +6,7 @@ import java.io.IOException;
 import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
+import java.io.PrintStream;
 import java.util.Random;
 
 /**
@@ -23,7 +24,7 @@ public class TrapHandler extends InstructionHandler {
 	 *            The MachineState to use and modify.
 	 */
 	@Override
-	public void execute(int instruction, MachineState state, MemoryBank memory) {
+	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
 		int pc = state.programCounter;
 		int trapVector = ByteOperations.extractValue(instruction, 0, 8);
 		int inputValue = 0;
@@ -32,10 +33,10 @@ public class TrapHandler extends InstructionHandler {
 			state.executing = false;
 			break;
 		case 0x31:
-			System.out.print(state.registers[0]);
+			output.print(state.registers[0]);
 			break;
 		case 0x21:
-			System.out.print((char) state.registers[0]);
+			output.print((char) state.registers[0]);
 			break;
 		case 0x43:
 			Random RND = new Random();
@@ -62,20 +63,18 @@ public class TrapHandler extends InstructionHandler {
 		case 0x22:
 			int memLocation = state.registers[0];
 			while (memory.read(memLocation) != 0) {
-				System.out.print((char) memory.read(memLocation));
+				output.print((char) memory.read(memLocation));
 				memLocation++;
-
 			}
 			break;
 		case 0x23:
 			InputStreamReader reader = new InputStreamReader(System.in);
 
-			System.out.print("? ");
+			output.print("? ");
 			try {
 				inputValue = reader.read();
 			} catch (IOException e) {
-
-				e.printStackTrace();
+				e.printStackTrace(output);
 			}
 			inputValue = ByteOperations.extractValue(inputValue, 0, 8);
 			state.registers[0] = (short) inputValue;
@@ -96,23 +95,20 @@ public class TrapHandler extends InstructionHandler {
 			}
 			break;
 		case 0x33:
-			System.out.print("d? ");
+			output.print("d? ");
 			int number = 0;
+			BufferedReader reader1 = null;
 			try {
-
-				BufferedReader reader1 = new BufferedReader(
-						new InputStreamReader(System.in));
+				reader1 = new BufferedReader(new InputStreamReader(System.in));
 				String input = reader1.readLine();
-
 				number = Integer.parseInt(input);
-
-			//	reader1.close();
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (NumberFormatException e) {
-				System.out.println("Input by user was not a number.");
-
+				reader1.close();
+			}
+			catch (IOException e) {
+				e.printStackTrace(output);
+			}
+			catch (NumberFormatException e) {
+				output.println("Input by user was not a number.");
 			}
 
 			state.registers[0] = (short) number;
@@ -131,11 +127,13 @@ public class TrapHandler extends InstructionHandler {
 					state.ccrZero = false;
 				}
 			}
-			System.out.println();
-			System.out.println(state.registers[0]);
 			break;
 		}
 		state.programCounter = pc;
 	}
 	
+	@Override
+	public String getName() {
+		return "Trap";
+	}
 }
