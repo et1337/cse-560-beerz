@@ -7,7 +7,7 @@ import java.io.PrintStream;
 import java.io.InputStream;
 
 /**
- * Handles a certain type of instruction.
+ * Handles the Load instruction.
  */
 public class LoadHandler extends InstructionHandler {
 	/**

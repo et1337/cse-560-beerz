@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.util.Random;
 
 /**
- * Handles a certain type of instruction.
+ * Handles the Trap instruction.
  */
 public class TrapHandler extends InstructionHandler {
 	/**

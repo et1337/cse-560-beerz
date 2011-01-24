@@ -5,7 +5,7 @@ import util.ByteOperations;
 import java.io.PrintStream;
 import java.io.InputStream;
 /**
- * Handles a certain type of instruction.
+ * Handles the Load (immediate mode) instruction.
  */
 public class LoadImmediateHandler extends InstructionHandler {
 	/**
