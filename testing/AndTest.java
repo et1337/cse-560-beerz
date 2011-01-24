@@ -12,7 +12,7 @@ import instructions.AndHandler;
  *
  *	Tests the functionality of the And function and verifies CCRs are being set correctly.
  */
-public class AndTest {
+public class AndTest extends TestBase {
 
 	/**
 	 * Contains the initial state of the memory used for testing.

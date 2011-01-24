@@ -1,4 +1,7 @@
 package state;
+import java.io.PrintStream;
+import instructions.DebugHandler;
+
 /**
  * This class represents the state of a virtual machine, not including the memory, which is represented by a MemoryBank.
  */
@@ -49,5 +52,13 @@ public class MachineState {
 			x.registers[i] = this.registers[i];
 		}
 		return x;
+	}
+	
+	/**
+	 * Outputs this MachineState to the given IO stream according to the DEBUG
+	 * instruction specifications.
+	 */
+	public void display(PrintStream output) {
+		new DebugHandler().execute(output, 0, this, null);
 	}
 }

@@ -11,7 +11,7 @@ import instructions.JumpSubroutineImmediateHandler;
  * @author Elliot
  *
  */
-public class JumpSubroutineImmediateTest {
+public class JumpSubroutineImmediateTest extends TestBase {
 	/**
 	 * Contains the initial state of the memory used for testing.
 	 */

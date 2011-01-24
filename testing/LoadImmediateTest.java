@@ -6,7 +6,7 @@ import state.MemoryBank;
 import state.MachineState;
 import instructions.LoadImmediateHandler;
 
-public class LoadImmediateTest {
+public class LoadImmediateTest extends TestBase {
 	/**
 	 * Contains the initial state of the memory used for testing.
 	 */

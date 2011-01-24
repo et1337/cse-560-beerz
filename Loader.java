@@ -88,7 +88,9 @@ public class Loader {
 	private static final int END_RECORD_LENGTH = 5;
 	
 	/**
-	 * Loads the given data into the memory bank.
+	 * Loads the given data into the memory bank. If syntax errors are
+	 * encountered, this method will collect them all into a single string
+	 * and throw an exception containing information about the errors.
 	 * @param data The data to process (presumably loaded straight from a file).
 	 * @param bank The memory bank to load data into.
 	 * @return the address to start execution from.
@@ -151,6 +153,7 @@ public class Loader {
 			errors.add(new Error("Object file does not contain an end record."));
 			
 		if(errors.size() > 0) {
+			// We have errors; throw an exception describing them
 			StringBuffer msg = new StringBuffer();
 			for(Error e : errors) {
 				msg.append("Load error: ");

@@ -11,7 +11,8 @@ public class ByteOperations {
 	
 	/**
 	 * Parses the given hex value into an integer value.
-	 * Upper- and lower-case letters are acceptable. Whitespace and other characters are not acceptable.
+	 * Upper- and lower-case letters are acceptable. Whitespace and other
+	 * characters are not acceptable.
 	 * Throws an exception if an invalid character is found.
 	 * @param hex A string representing a hex value.
 	 * @return An integer value representing the input hex value.
@@ -30,6 +31,15 @@ public class ByteOperations {
 		return result;
 	}
 	
+	/**
+	 * Extracts a certain number of bits from the given value by masking out
+	 * the other bits and shifting the desired bits all the way to the right.
+	 * @param value The 32-bit number to extract the value from.
+	 * @param start The location (from the right) of the first bit to extract.
+	 * @param end The location (from the right) of the last bit to extract.
+	 * @return The value masked out from the input value and shifted all the
+	 * the way to the right.
+	 */
 	public static int extractValue(int value, int start, int end) {
 		int mask = 0;
 		for(int i = start; i < end; i++) {
@@ -39,17 +49,21 @@ public class ByteOperations {
 	}
 	
 	/**
-	 * Gets a hexadecimal string representation of the given value. Eliminates all but the least significant hex digits specified by numCharacters.
+	 * Gets a hexadecimal string representation of the given value. Eliminates
+	 * all but the least significant hex digits specified by numCharacters.
 	 * @param value The integer value to convert to hexadecimal.
 	 * @param numCharacters The number of least significant hex digits to display.
 	 * @return A string hexadecimal representation of the given integer value.
 	 */
 	public static String getHex(int value, int numCharacters) {
-		char[] result = new char[numCharacters];
-		for (int i = 0; i < numCharacters; i++) {
-			result[(numCharacters - 1) - i] = Character.forDigit(value % ByteOperations.HEXADECIMAL_RADIX, ByteOperations.HEXADECIMAL_RADIX);
-			value /= ByteOperations.HEXADECIMAL_RADIX;
+		int mask = 0;
+		for(int i = 0; i < numCharacters; i++) {
+			mask |= 0xF << (i * 4);
 		}
-		return new String(result);
+		String result = Integer.toHexString(value & mask);
+		while (result.length() < numCharacters) {
+			result = "0" + result;
+		}
+		return result;
 	}
 }

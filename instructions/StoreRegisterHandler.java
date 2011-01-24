@@ -2,6 +2,7 @@ package instructions;
 import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
+import java.io.PrintStream;
 /**
  * Handles a certain type of instruction.
  */
@@ -39,8 +40,9 @@ public class StoreRegisterHandler extends InstructionHandler {
 	 * Value used to zero extend the value of the index.
 	 */
 	private static final int ZERO_MASK = 0x003F;
+	
 	@Override
-	public void execute(int instruction, MachineState state, MemoryBank memory) {
+	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
 		// extract source register
 		int srcRegister = ByteOperations.extractValue(instruction,
 				SRC_LOW_BIT, SRC_HI_BIT);
@@ -55,5 +57,10 @@ public class StoreRegisterHandler extends InstructionHandler {
 		//write the value in the source register to the address in the base register
 		//plus the index
 		memory.write((state.registers[baseRegister] + index), state.registers[srcRegister]);
+	}
+	
+	@Override
+	public String getName() {
+		return "Store Register";
 	}
 }

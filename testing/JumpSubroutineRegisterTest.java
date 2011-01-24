@@ -6,7 +6,7 @@ import state.MemoryBank;
 import state.MachineState;
 import instructions.JumpSubroutineRegisterHandler;
 
-public class JumpSubroutineRegisterTest {
+public class JumpSubroutineRegisterTest extends TestBase {
 
 	/**
 	 * Contains the initial state of memory for testing.

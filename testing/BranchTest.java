@@ -6,7 +6,7 @@ import state.MemoryBank;
 import state.MachineState;
 import instructions.BranchHandler;
 
-public class BranchTest {
+public class BranchTest extends TestBase {
 	/**
 	 * Contains the initial state of the memory used for testing.
 	 */

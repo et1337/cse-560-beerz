@@ -2,6 +2,7 @@ package instructions;
 import state.MachineState;
 import state.MemoryBank;
 import util.ByteOperations;
+import java.io.PrintStream;
 /**
  * Handles a certain type of instruction.
  */
@@ -62,7 +63,7 @@ public class AndHandler extends InstructionHandler {
 	private static final int SIGN_EXTEND = 0xFFF0;
 
 	@Override
-	public void execute(int instruction, MachineState state, MemoryBank memory) {
+	public void execute(PrintStream output, int instruction, MachineState state, MemoryBank memory) {
 //extract destination register
 		int destRegister = ByteOperations.extractValue(instruction,
 				DEST_LOW_BIT, DEST_HI_BIT);
@@ -104,5 +105,10 @@ public class AndHandler extends InstructionHandler {
 				state.ccrPositive = false;
 			}
 		}
+	}
+	
+	@Override
+	public String getName() {
+		return "And";
 	}
 }
