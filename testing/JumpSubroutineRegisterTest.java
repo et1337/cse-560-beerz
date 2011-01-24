@@ -26,7 +26,7 @@ public class JumpSubroutineRegisterTest extends TestBase {
 		bank = new MemoryBank();
 		state = new MachineState();
 		this.state.programCounter = 0x3000;
-		bank.write(0x120d, (short)0x45D3);
+		bank.write(0x120d, (short) 0x45D3);
 		bank.write(0x2035, (short) 0x1920);
 		bank.write(0x5025, (short) 0x1002);
 		bank.write(0x700F, (short) 0x4343);
