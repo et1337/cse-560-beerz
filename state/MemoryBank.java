@@ -56,7 +56,7 @@ public class MemoryBank {
 	 */
 	public void displayPage(PrintStream output, int page) {
 		int pageStart = page << MemoryBank.PAGE_SHIFT;
-		int pageEnd = (page + 1) << MemoryBank.PAGE_SHIFT;
+		int pageEnd = ((page + 1) << MemoryBank.PAGE_SHIFT) + 8;
 		StringBuffer line = new StringBuffer();
 		for(int i = pageStart; i < pageEnd; i++) {
 			if ((i - pageStart) % 8 == 0) {

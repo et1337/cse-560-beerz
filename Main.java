@@ -105,7 +105,7 @@ public class Main {
 				machine.run(startAddress, mode);
 			}
 			catch (Exception e) {
-				e.printStackTrace(printStream);
+				printStream.println(e.getMessage());
 				return;
 			}
 		}
@@ -136,10 +136,11 @@ public class Main {
 	private static String readAllText(String filename) throws IOException {
         StringBuffer fileData = new StringBuffer();
         BufferedReader reader = new BufferedReader(new FileReader(filename));
-		char[] chars = new char[1024];
 		int numRead = 0;
-		while ((numRead = reader.read(chars)) > -1) {
-			fileData.append(String.valueOf(chars));
+		String line = null;
+		while ((line = reader.readLine()) != null) {
+			fileData.append(line);
+			fileData.append("\n");
 		}
         reader.close();
         return fileData.toString();
