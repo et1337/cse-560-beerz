@@ -89,6 +89,11 @@ public class Loader {
 	private static final int END_RECORD_LENGTH = 5;
 	
 	/**
+	 * Maximum memory segment size
+	 */
+	private static final int MAX_ADDRESS = 65535;
+	
+	/**
 	 * Loads the given data into the memory bank. If syntax errors are
 	 * encountered, this method will collect them all into a single string
 	 * and throw an exception containing information about the errors.
@@ -117,6 +122,9 @@ public class Loader {
 						errors.add(new Error(lineNumber, "Length of header record is incorrect. Should be " + Integer.toString(Loader.HEADER_RECORD_LENGTH) + " characters."));
 					firstAddress = ByteOperations.parseHex(line.substring(7, 11));
 					lastAddress = firstAddress + ByteOperations.parseHex(line.substring(11)) - 1;
+					if(firstAddress > Loader.MAX_ADDRESS || lastAddress > Loader.MAX_ADDRESS) {
+						errors.add(new Error(lineNumber, "Memory segment length is too large for virtual machine."));
+					}
 					hasHeaderRecord = true;
 				}
 				else if (line.startsWith("T")) {
@@ -134,6 +142,9 @@ public class Loader {
 					if(line.length() != Loader.END_RECORD_LENGTH)
 						errors.add(new Error(lineNumber, "Length of end record is incorrect. Should be " + Integer.toString(Loader.END_RECORD_LENGTH) + " characters."));
 					startAddress = ByteOperations.parseHex(line.substring(1));
+					if(startAddress < firstAddress || startAddress > lastAddress) {
+						errors.add(new Error(lineNumber, "Execution start address 0x" + line.substring(1).toLowerCase() + " outside specified memory segment range."));
+					}
 					hasEndRecord = true;
 				}
 				else {
