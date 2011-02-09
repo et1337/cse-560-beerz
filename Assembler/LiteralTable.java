@@ -5,6 +5,11 @@ public class LiteralTable {
 
 	private int index = 0;
 	private Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+	private int offset;
+	
+	public void setOffset(int offset) {
+		this.offset = offset;
+	}
 	
 	public void define(int value) {
 		if (!this.map.containsKey(value)) {
@@ -14,6 +19,6 @@ public class LiteralTable {
 	}
 	
 	public int getAddress(int value) {
-		return this.map.get(value);
+		return this.map.get(value) + this.offset;
 	}
 }

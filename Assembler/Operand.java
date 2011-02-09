@@ -3,22 +3,12 @@ public class Operand {
 	private OperandDefinition definition;
 	private String value;
 	private OperandType type;
+	private int origin;
 	
-	public Operand(String value, LiteralTable literals) throws Exception {
+	public Operand(String value, LiteralTable literals, int origin) throws Exception {
 		this.value = value;
-		char firstCharacter = this.value.charAt(0);
-		if (firstCharacter == '=') {
-			this.type = OperandType.LITERAL;
-		}
-		else if (firstCharacter == 'R') {
-			this.type = OperandType.REGISTER;
-		}
-		else if (firstCharacter == '#' || firstCharacter == 'x') {
-			this.type = OperandType.IMMEDIATE;
-		}
-		else {
-			this.type = OperandType.SYMBOL;
-		}
+		this.origin = origin;
+		this.type = Operand.determineType(this.value);
 		if (this.type == OperandType.LITERAL) {
 			literals.define(Operand.parseConstant(this.value));
 		}
@@ -34,25 +24,47 @@ public class Operand {
 	
 	public void insert(int[] ops, SymbolTable symbols, LiteralTable literals) throws Exception {
 		int x = Operand.getValue(this.value, symbols, literals);
+		if (this.definition.isRelocatable()) {
+			x -= this.origin;
+		}
 		ops[this.definition.getOperationIndex()] |= this.definition.getMask() & (x << this.definition.getLeastSignificantBit());
 	}
 	
-	public static int getValue(String value, SymbolTable symbols, LiteralTable literals) throws Exception {
-		if (value.charAt(0) == '=') {
-			return literals.getAddress(Operand.parseConstant(value));
+	public static OperandType determineType(String value) {
+		char firstCharacter = value.charAt(0);
+		if (firstCharacter == '=') {
+			return OperandType.LITERAL;
 		}
-		else if (value.charAt(0) == '#' || value.charAt(0) == 'x') {
-			return Operand.parseConstant(value);
+		else if (firstCharacter == '#' || firstCharacter == 'x') {
+			return OperandType.IMMEDIATE;
 		}
-		else if (symbols.hasSymbol(value)) {
-			Symbol symbol = symbols.get(value);
-			//if (symbol.isRelocatable() && !this.definition.isRelocatable()) {
-			//	// Error
-			//}
-			return symbol.getValue();
+		else if (firstCharacter == 'R') {
+			return OperandType.REGISTER;
 		}
 		else {
-			// Error: undefined symbol
+			return OperandType.SYMBOL;
+		}
+	}
+	
+	public static int getValue(String value, SymbolTable symbols, LiteralTable literals) throws Exception {
+		OperandType type = Operand.determineType(value);
+		switch (type) {
+			case LITERAL:
+				return literals.getAddress(Operand.parseConstant(value));
+			case IMMEDIATE:
+				return Operand.parseConstant(value);
+			case REGISTER:
+				return Operand.parseConstant(value);
+			case SYMBOL:
+				if (symbols.hasSymbol(value)) {
+					//if (symbol.isRelocatable() && !this.definition.isRelocatable()) {
+					//	// Error
+					//}
+					return symbols.get(value).getValue();
+				}
+				else {
+					// Error: undefined symbol
+				}
 		}
 		return 0;
 	}
