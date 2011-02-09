@@ -1,5 +1,6 @@
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
 
 public class LiteralTable {
 
@@ -11,6 +12,10 @@ public class LiteralTable {
 		this.offset = offset;
 	}
 	
+	public int getOffset() {
+		return this.offset;
+	}
+	
 	public void define(int value) {
 		if (!this.map.containsKey(value)) {
 			this.map.put(value, this.index);
@@ -20,5 +25,9 @@ public class LiteralTable {
 	
 	public int getAddress(int value) {
 		return this.map.get(value) + this.offset;
+	}
+	
+	public Set<Map.Entry<Integer, Integer>> getEntries() {
+		return this.map.entrySet();
 	}
 }

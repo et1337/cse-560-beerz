@@ -24,8 +24,8 @@ public class Operand {
 	
 	public void insert(int[] ops, SymbolTable symbols, LiteralTable literals) throws Exception {
 		int x = Operand.getValue(this.value, symbols, literals);
-		if (this.definition.isRelocatable()) {
-			x -= this.origin;
+		if (this.definition.isRelocatable() && this.type == OperandType.IMMEDIATE) {
+			x -= this.origin & 0x01FF;
 		}
 		ops[this.definition.getOperationIndex()] |= this.definition.getMask() & (x << this.definition.getLeastSignificantBit());
 	}

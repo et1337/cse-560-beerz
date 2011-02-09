@@ -1,4 +1,6 @@
 import java.util.List;
+import java.util.Iterator;
+import java.util.Map;
 import util.ByteOperations;
 
 public class Program {
@@ -44,6 +46,11 @@ public class Program {
 			catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+		Iterator<Map.Entry<Integer, Integer>> entryIterator = this.literals.getEntries().iterator();
+		while (entryIterator.hasNext()) {
+			Map.Entry<Integer, Integer> entry = entryIterator.next();
+			System.out.println(ByteOperations.getHex(entry.getValue() + this.literals.getOffset(), 4) + ByteOperations.getHex(entry.getKey(), 4));
 		}
 	}
 }
