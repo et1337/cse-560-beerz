@@ -199,11 +199,11 @@ public class Parser {
 				
 			try {
 			
-				String label = line.substring(0, 6).trim();
-				String op = line.substring(8, 13).trim();
+				String label = line.substring(0, 7).trim();
+				String op = line.substring(9, 14).trim();
 				String[] operands = this.getOperands(line);
 				
-				if(!label.equals("") && !op.equals(".EQU")) {
+				if (!label.equals("") && !op.equals(".EQU")) {
 					symbols.define(new Symbol(label, location, true));
 				}
 				
@@ -298,7 +298,7 @@ public class Parser {
 	}
 	
 	protected String[] getOperands(String line) {
-		String trimmed = line.substring(15).trim();
+		String trimmed = line.substring(17).trim();
 		ArrayList<String> result = new ArrayList<String>();
 		boolean inQuotes = false;
 		String currentOperand = "";
