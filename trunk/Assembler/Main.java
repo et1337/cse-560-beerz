@@ -18,6 +18,7 @@ public class Main {
 			String data = Main.readAllText(args[0]);
 			Parser parser = new Parser();
 			Program program = parser.parse(data);
+			program.printListing();
 		}
 		catch (IOException e) {
 			System.out.println("Failed to open file \"" + args[0] + "\".");

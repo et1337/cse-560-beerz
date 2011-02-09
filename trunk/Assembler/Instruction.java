@@ -18,10 +18,10 @@ public class Instruction {
 		}
 	}
 	
-	public void setOperands(String[] values, LiteralTable literals) throws Exception {
+	public void setOperands(String[] values, LiteralTable literals, int origin) throws Exception {
 		this.operands = new Operand[values.length];
 		for (int i = 0; i < values.length; i++) {
-			this.operands[i] = new Operand(values[i], literals);
+			this.operands[i] = new Operand(values[i], literals, origin);
 		}
 	}
 	
@@ -43,8 +43,10 @@ public class Instruction {
 	
 	public int[] getCodes(SymbolTable symbols, LiteralTable literals) throws Exception {
 		int[] result = this.definition.getOperations();
-		for (Operand operand : this.operands) {
-			operand.insert(result, symbols, literals);
+		if (this.operands != null) {
+			for (Operand operand : this.operands) {
+				operand.insert(result, symbols, literals);
+			}
 		}
 		return result;
 	}

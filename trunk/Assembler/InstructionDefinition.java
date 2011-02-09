@@ -4,7 +4,8 @@ public class InstructionDefinition {
 	private OperandDefinition[] operands;
 	private String name;
 	
-	public InstructionDefinition(int numOperations) {
+	public InstructionDefinition(String name, int numOperations) {
+		this.name = name;
 		this.operations = new int[numOperations];
 		this.operands = new OperandDefinition[numOperations];
 		for (int i = 0; i < numOperations; i++) {
