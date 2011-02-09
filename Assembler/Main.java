@@ -14,6 +14,15 @@ public class Main {
 			Main.printUsageInformation();
 			return;
 		}
+		try {
+			String data = Main.readAllText(args[0]);
+			Parser parser = new Parser();
+			Program program = parser.parse(data);
+		}
+		catch (IOException e) {
+			System.out.println("Failed to open file \"" + args[0] + "\".");
+			return;
+		}
 	}
 	
 	/**

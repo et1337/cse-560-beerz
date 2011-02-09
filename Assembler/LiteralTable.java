@@ -4,7 +4,7 @@ import java.util.HashMap;
 public class LiteralTable {
 
 	private int index = 0;
-	private Map<int, int> map = new HashMap<int, int>();
+	private Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 	
 	public void define(int value) {
 		if (!this.map.containsKey(value)) {

@@ -10,14 +10,15 @@ public class SymbolTable {
 	}
 	
 	public void define(String alias, String target) {
-		this.define(alias, this.get(target));
+		Symbol symbol = this.get(target);
+		this.define(new Symbol(alias, symbol.getValue(), symbol.isRelocatable()));
 	}
 	
 	public boolean hasSymbol(String name) {
 		return this.map.containsKey(name);
 	}
 	
-	public int get(String name) {
+	public Symbol get(String name) {
 		return this.map.get(name);
 	}
 }

@@ -3,24 +3,25 @@ public class Instruction {
 	private InstructionDefinition definition;
 	private Operand[] operands;
 	private String source;
+	private String name;
 	
-	public Instruction(String source) {
+	public Instruction(String name, String source) {
+		this.name = name;
 		this.source = source;
 	}
 	
 	public void setDefinition(InstructionDefinition definition) {
 		this.definition = definition;
-		this.source = source;
-		this.operands = new Operand[numOperands];
+		OperandDefinition[] definitions = this.definition.getOperandDefinitions();
+		for (int i = 0; i < definitions.length; i++) {
+			this.operands[i].setDefinition(definitions[i]);
+		}
 	}
 	
-	public void setOperands(String[] values) {
-		OperandDefinition[] definitions = this.definition.getOperandDefinitions();
-		if (values.length != definitions.length) {
-			// Error
-		}
+	public void setOperands(String[] values, LiteralTable literals) throws Exception {
+		this.operands = new Operand[values.length];
 		for (int i = 0; i < values.length; i++) {
-			this.operands[i] = new Operand(definitions[i], values[i]);
+			this.operands[i] = new Operand(values[i], literals);
 		}
 	}
 	
@@ -28,13 +29,21 @@ public class Instruction {
 		return this.source;
 	}
 	
+	public String getName() {
+		return this.name;
+	}
+	
 	public InstructionDefinition getDefinition() {
 		return this.definition;
 	}
 	
-	public int[] getCodes(SymbolTable symbols, LiteralTable literals) {
+	public Operand[] getOperands() {
+		return this.operands;
+	}
+	
+	public int[] getCodes(SymbolTable symbols, LiteralTable literals) throws Exception {
 		int[] result = this.definition.getOperations();
-		for (Operand operand in this.operands) {
+		for (Operand operand : this.operands) {
 			operand.insert(result, symbols, literals);
 		}
 		return result;
