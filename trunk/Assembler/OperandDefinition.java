@@ -67,13 +67,13 @@ public class OperandDefinition {
 		return result;
 	}
 
-	// Gets the ight-aligned index of the most significant bit this definition's
+	// Gets the right-aligned index of the most significant bit this definition's
 	// Operands are allowed to affect in the executable code.
 	public int getMostSignificantBit() {
 		return this.mostSignificant;
 	}
 	
-	// Gets the ight-aligned index of the least significant bit this definition's
+	// Gets the right-aligned index of the least significant bit this definition's
 	// Operands are allowed to affect in the executable code.
 	public int getLeastSignificantBit() {
 		return this.leastSignificant;
