@@ -1,3 +1,5 @@
+package Assembler;
+
 // An InstructionDefinition represents a certain type of assembly instruction (like
 // ADD, LD, STR, etc.). Once an assembly instruction is matched with a definition, the
 // definition is used to turn the source code into binary executable code.

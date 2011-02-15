@@ -1,3 +1,5 @@
+package Assembler;
+
 // An Instruction corresponds to one line of assembly source code.
 // It may correspond to 0 or more memory allocations in the final program.
 // An Instruction has a definition, a name, and a collection of Operands.

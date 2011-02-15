@@ -1,3 +1,5 @@
+package Assembler;
+
 // Enumerates the possible types of Operands:
 // Immediate - represents a constant value (e.g. xA7, #13)
 // Register - corresponds to a register R0-R7.

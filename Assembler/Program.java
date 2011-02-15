@@ -1,9 +1,11 @@
+package Assembler;
+
 import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
 import java.io.PrintStream;
 import java.io.OutputStream;
-import util.ByteOperations;
+import Assembler.util.ByteOperations;
 
 // A Program contains an in-memory representation of an assembly Program, which can
 // be rendered into binary form with the getCode function.

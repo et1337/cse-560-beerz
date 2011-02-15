@@ -1,4 +1,4 @@
-package util;
+package Assembler.util;
 
 /**
  * Utility class containing methods for dealing with bits and bytes.

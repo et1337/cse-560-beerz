@@ -1,3 +1,5 @@
+package Assembler;
+
 // A Symbol is basically a name/value pair with an extra flag that
 // defines whether the Symbol is relocatable or consant.
 public class Symbol {
