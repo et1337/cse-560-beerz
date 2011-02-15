@@ -1,3 +1,5 @@
+package Assembler;
+
 import java.util.Arrays;
 
 // An OperandDefinition states which values are acceptable for Operands that
