@@ -3,11 +3,17 @@ import java.util.LinkedList;
 import java.util.ArrayList;
 import util.ByteOperations;
 
-public class Parser {
+// The Assembler has no state; it contains a constant instruction definition table,
+// but other than that it is only used to assemble Programs.
+public class Assembler {
 
+	// Definitions of program instructions. Psuedo-ops are not defined in this table.
 	private InstructionDefinition[] instructionDefinitions;
 	
-	public Parser() {
+	// Instantiates a new Assembler. Initializes the instruction definition table.
+	public Assembler() {
+		
+		// Initialize instruction definition table.
 		this.instructionDefinitions = new InstructionDefinition[] {
 			new InstructionDefinition(
 				"ADD",
@@ -184,7 +190,8 @@ public class Parser {
 		};
 	}
 	
-	public Program parse(String data) {
+	// Assembles the given code into a Program.
+	public Program assemble(String filename, String data) {	
 		String[] lines = data.split("\n");
 		SymbolTable symbols = new SymbolTable();
 		LiteralTable literals = new LiteralTable();
@@ -194,6 +201,7 @@ public class Parser {
 		int origin = 0;
 		int lineNumber = 1;
 		for (String line : lines) {
+		
 			if (line.charAt(0) == ';')
 				continue; // Skip comment lines
 				
@@ -209,12 +217,16 @@ public class Parser {
 				
 				Instruction instruction = new Instruction(op, line);
 				
+				// First check if the instruction is a psuedo-op.
 				if (op.equals(".ORIG")) {
 					instruction.setDefinition(new InstructionDefinition(".ORIG", 0));
 					if (operands.length > 1 || operands.length == 0) {
 						// Error
 					}
-					origin = ByteOperations.parseHex(operands[0]);
+					if (Operand.determineType(operands[0]) != OperandType.IMMEDIATE) {
+						// Error
+					}
+					origin = Operand.parseConstant(operands[0]);
 				}
 				else if (op.equals(".EQU")) {
 					instruction.setDefinition(new InstructionDefinition(".EQU", 0));
@@ -233,7 +245,7 @@ public class Parser {
 					if (operands.length > 1 || operands.length == 0) {
 						// Error
 					}
-					instruction.setOperands(operands, literals, origin);
+					instruction.setOperands(operands, literals);
 					instruction.setDefinition(new InstructionDefinition(".FILL", 1));
 				}
 				else if (op.equals(".STRZ")) {
@@ -246,7 +258,7 @@ public class Parser {
 						chars[i] = "x" + ByteOperations.getHex((int) stringLiteral.charAt(i), 4);
 					}
 					chars[stringLiteral.length()] = "x0000";
-					instruction.setOperands(chars, literals, origin);
+					instruction.setOperands(chars, literals);
 					instruction.setDefinition(new InstructionDefinition(".STRZ", stringLiteral.length() + 1));
 				}
 				else if (op.equals(".END")) {
@@ -255,7 +267,11 @@ public class Parser {
 						// Error
 					}
 					if (operands.length == 1) {
+						OperandType type = Operand.determineType(operands[0]);
 						startAddress = Operand.getValue(operands[0], symbols, literals);
+						if (type == OperandType.IMMEDIATE) {
+							startAddress -= origin & 0x01ff;
+						}
 					}
 				}
 				else if (op.equals(".BLKW")) {
@@ -266,7 +282,8 @@ public class Parser {
 					location += Operand.getValue(operands[0], symbols, literals);
 				}
 				else {
-					instruction.setOperands(operands, literals, origin);
+					// The instruction is not a pseudo-op. Look it up in the instruction definition table.
+					instruction.setOperands(operands, literals);
 					InstructionDefinition definition = this.getInstructionDefinition(instruction);
 					if (definition == null) {
 						// Error
@@ -285,9 +302,12 @@ public class Parser {
 			}
 			lineNumber++;
 		}
-		return new Program(symbols, literals, instructions, startAddress, origin);
+		literals.setOffset(location);
+		return new Program(this.getNameFromFilename(filename), symbols, literals, instructions, startAddress, origin);
 	}
 	
+	// Given an Instruction with a name and collection of Operands, finds an InstructionDefinition
+	// in the instruction definition table that matches the Instruction.
 	protected InstructionDefinition getInstructionDefinition(Instruction instruction) {
 		for (InstructionDefinition definition : this.instructionDefinitions) {
 			if (definition.isAcceptable(instruction)) {
@@ -297,12 +317,13 @@ public class Parser {
 		return null;
 	}
 	
+	// Extracts the raw string values of the Operands in a given line of source code.
 	protected String[] getOperands(String line) {
 		String trimmed = line.substring(17).trim();
 		ArrayList<String> result = new ArrayList<String>();
 		boolean inQuotes = false;
 		String currentOperand = "";
-		for(int i = 0; i < trimmed.length(); i++) {
+		for (int i = 0; i < trimmed.length(); i++) {
 			char c = trimmed.charAt(i);
 			if (inQuotes) {
 				if (c == '"') {
@@ -330,10 +351,15 @@ public class Parser {
 				}
 			}
 		}
-		if(!currentOperand.trim().equals("")) {
+		if (!currentOperand.trim().equals("")) {
 			result.add(currentOperand.trim());
 		}
 		String[] array = new String[result.size()];
 		return result.toArray(array);
+	}
+	
+	// Returns a usable segment name for a program from the given filename.
+	protected String getNameFromFilename(String filename) {
+		return String.format("%1$-6s", filename.substring(0, 6));
 	}
 }

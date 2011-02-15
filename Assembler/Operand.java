@@ -1,35 +1,55 @@
 import util.ByteOperations;
+
+// An Operand represents a value (a Symbol, register identifier, literal, or
+// immediate value) to be inserted into an instruction.
 public class Operand {
+
+	// Definition of this Operand.
 	private OperandDefinition definition;
-	private String value;
-	private OperandType type;
-	private int origin;
 	
-	public Operand(String value, LiteralTable literals, int origin) throws Exception {
+	// The string value of this Operand extracted straight from the source code.
+	private String value;
+	
+	// Indicates what type of Operand this is (register identifier, symbol,
+	// literal, or immediate value)
+	private OperandType type;
+	
+	// Instantiates a new Operand with the given string value extracted from the
+	// source. If the Operand is a literal, defines a literal in the given
+	// LiteralTable.
+	public Operand(String value, LiteralTable literals) throws Exception {
 		this.value = value;
-		this.origin = origin;
 		this.type = Operand.determineType(this.value);
 		if (this.type == OperandType.LITERAL) {
 			literals.define(Operand.parseConstant(this.value));
 		}
 	}
 	
+	// Sets the definition of this Operand. No work is done at this point.
 	public void setDefinition(OperandDefinition definition) {
 		this.definition = definition;
 	}
 	
+	// Returns what type of Operand this is (register identifier, symbol,
+	// literal, or immediate value)
 	public OperandType getType() {
 		return this.type;
 	}
 	
-	public void insert(int[] ops, SymbolTable symbols, LiteralTable literals) throws Exception {
+	// Inserts the binary value of this Operand into the given instruction (ops).
+	// The given SymbolTable and LiteralTable are used to resolve the binary value
+	// of the Operand. The origin is the first address of the program; it is used to
+	// offset relocatable immediate values.
+	public void insert(int[] ops, SymbolTable symbols, LiteralTable literals, int origin) throws Exception {
 		int x = Operand.getValue(this.value, symbols, literals);
 		if (this.definition.isRelocatable() && this.type == OperandType.IMMEDIATE) {
-			x -= this.origin & 0x01FF;
+			x -= origin & 0x01ff;
 		}
 		ops[this.definition.getOperationIndex()] |= this.definition.getMask() & (x << this.definition.getLeastSignificantBit());
 	}
 	
+	// Given the string representation of an Operand, returns the OperandType that
+	// describes it. (register identifier, symbol, literal, or immediate value)
 	public static OperandType determineType(String value) {
 		char firstCharacter = value.charAt(0);
 		if (firstCharacter == '=') {
@@ -46,6 +66,9 @@ public class Operand {
 		}
 	}
 	
+	// Gets the binary Operand value represented by the given string. The SymbolTable
+	// and LiteralTable are used to resolve the binary value. Note: relocatable
+	// immediate values are NOT relocated by this function.
 	public static int getValue(String value, SymbolTable symbols, LiteralTable literals) throws Exception {
 		OperandType type = Operand.determineType(value);
 		switch (type) {
@@ -69,6 +92,8 @@ public class Operand {
 		return 0;
 	}
 	
+	// Parses a register identifier, literal value, decimal value, or hexadecimal value
+	// into an integer number.
 	public static int parseConstant(String value) throws Exception {
 		int result = 0;
 		if (value.charAt(0) == '=') {
