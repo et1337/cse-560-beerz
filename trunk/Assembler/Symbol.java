@@ -1,23 +1,35 @@
+// A Symbol is basically a name/value pair with an extra flag that
+// defines whether the Symbol is relocatable or consant.
 public class Symbol {
 	
+	// The name of the Symbol.
 	private String name;
+	
+	// The value of the Symbol.
 	private int value;
+	
+	// Whether the Symbol is relocatable or not.
 	private boolean isRelocatable;
 	
+	// Instantiates a new Symbol with the given name and value.
+	// Also initializes the relocatable flag.
 	public Symbol(String name, int value, boolean isRelocatable) {
 		this.name = name;
 		this.value = value;
 		this.isRelocatable = isRelocatable;
 	}
 	
+	// Gets the name of this Symbol.
 	public String getName() {
 		return this.name;
 	}
 	
+	// Gets the value of this Symbol.
 	public int getValue() {
 		return this.value;
 	}
 	
+	// Returns true if this Symbol is relocatable, false if not.
 	public boolean isRelocatable() {
 		return this.isRelocatable;
 	}
