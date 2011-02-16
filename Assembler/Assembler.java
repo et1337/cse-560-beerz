@@ -3,7 +3,7 @@ package Assembler;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.ArrayList;
-import Assembler.util.ByteOperations;
+import util.ByteOperations;
 
 // The Assembler has no state; it contains a constant instruction definition table,
 // but other than that it is only used to assemble Programs.

@@ -1,6 +1,6 @@
 package Assembler;
 
-import Assembler.util.ByteOperations;
+import util.ByteOperations;
 
 // An Operand represents a value (a Symbol, register identifier, literal, or
 // immediate value) to be inserted into an instruction.
