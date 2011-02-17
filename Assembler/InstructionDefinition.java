@@ -89,6 +89,19 @@ public class InstructionDefinition {
 		return this.operands;
 	}
 	
+	// Returns an array of bitmasks which specify which parts of the instruction
+	// are relocatable.
+	public int[] getRelocationMasks() {
+		int[] masks = new int[this.operations.length];
+		for (int i = 0; i < this.operands.length; i++) {
+			OperandDefinition operandDefinition = this.operands[i];
+			if (operandDefinition.isRelocatable()) {
+				masks[operandDefinition.getOperationIndex()] |= operandDefinition.getMask();
+			}
+		}
+		return masks;
+	}
+	
 	// Gets the name of this definition. Used to match instruction names
 	// extracted from source code lines.
 	public String getName() {

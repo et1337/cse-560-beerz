@@ -68,4 +68,14 @@ public class ByteOperations {
 		}
 		return result;
 	}
+	
+	/**
+	 * Returns true if the bit in "value" at the specified right-aligned index is 1.
+	 * @param value The integer value to extract the bit from.
+	 * @param index The right-aligned index of the bit to extract.
+	 * @return A boolean indicating whether the specified bit is 1.
+	 */
+	public static boolean getBit(int value, int index) {
+		return ((value >> index) & 1) == 1;
+	}
 }

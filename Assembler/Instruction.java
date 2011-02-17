@@ -69,12 +69,11 @@ public class Instruction {
 	
 	// Gets the final executable binary codes called for by this Instruction.
 	// The SymbolTable and LiteralTable are used to resolve Operand values.
-	// "origin" is the first address of the program.
-	public int[] getCodes(SymbolTable symbols, LiteralTable literals, int origin) throws Exception {
+	public int[] getCodes(SymbolTable symbols, LiteralTable literals) throws Exception {
 		int[] result = this.definition.getOperations();
 		if (this.operands != null) {
 			for (Operand operand : this.operands) {
-				operand.insert(result, symbols, literals, origin);
+				operand.insert(result, symbols, literals);
 			}
 		}
 		return result;

@@ -29,14 +29,18 @@ public class Program {
 	// Name for the program. Used as the segment name in the header record.
 	private String name;
 	
+	// True if the program is relocatable.
+	private boolean isRelocatable;
+	
 	// Instantiates a new Program with the given data.
-	public Program(String name, SymbolTable symbols, LiteralTable literals, List<Instruction> instructions, int startAddress, int origin) {
+	public Program(String name, boolean isRelocatable, SymbolTable symbols, LiteralTable literals, List<Instruction> instructions, int startAddress, int origin) {
+		this.name = name;
+		this.isRelocatable = isRelocatable;
 		this.symbols = symbols;
 		this.literals = literals;
 		this.instructions = instructions;		
 		this.startAddress = startAddress;
 		this.origin = origin;
-		this.name = name;
 	}
 	
 	// Gets the object code for this Program, optionally displaying a
@@ -67,50 +71,40 @@ public class Program {
 		result.append(header);
 		result.append("\n");
 		
-		int address = 0;
-		
-		// Output modification records. Note: modification records use bitmask format.
-		// That is, any bits that need relocated will be 1, all other bits will be 0.
-		for (Instruction instruction : this.instructions) {
-			OperandDefinition[] operandDefinitions = instruction.getDefinition().getOperandDefinitions();
-			int[] codes = new int[operandDefinitions.length];
-			for (int i = 0; i < operandDefinitions.length; i++) {
-				OperandDefinition operandDefinition = operandDefinitions[i];
-				if (operandDefinition.isRelocatable()) {
-					codes[operandDefinition.getOperationIndex()] |= operandDefinition.getMask();
-				}
-			}
-			for (int i = 0; i < codes.length; i++) {
-				if (codes[i] != 0) {
-					String code2 = ByteOperations.getHex(address + i, 4) + ByteOperations.getHex(codes[i] & 0xffff, 4);
-					result.append("M");
-					result.append(code2);
-					result.append("\n");
-				}
-			}
-			address += instruction.getDefinition().getSize();
-		}
-		
-		address = 0;
+		int address = this.origin;
 		
 		// Output instructions.
 		for (Instruction instruction : this.instructions) {
 			try {
-				int[] codes = instruction.getCodes(this.symbols, this.literals, this.origin);
-				String code = "        ";
+				int[] codes = instruction.getCodes(this.symbols, this.literals);
 				if (codes.length > 0) {
-					code = ByteOperations.getHex(address, 4) + ByteOperations.getHex(codes[0], 4);
-					result.append("T");
-					result.append(code);
-					result.append("\n");
+					int[] relocationMasks = instruction.getDefinition().getRelocationMasks();
+					for (int i = 0; i < codes.length; i++) {
+						String code = ByteOperations.getHex(address + i, 4) + ByteOperations.getHex(codes[i], 4);
+						String output = code;
+						if (i == 0) {
+							output += "    " + instruction.getSource();
+						}
+						out.println(output);
+						result.append("T");
+						result.append(code);
+						if (this.isRelocatable) {
+							// For our purposes, we only have two types of relocatable addresses:
+							// 9-bit page address offsets, and full sixteen bit addresses.
+							if (ByteOperations.getBit(relocationMasks[i], 15)) {
+								// It's a full sixteen bit modification record
+								result.append("M1");
+							}
+							else if (ByteOperations.getBit(relocationMasks[i], 0)) {
+								// It's a 9-bit page address offset.
+								result.append("M0");
+							}
+						}
+						result.append("\n");
+					}
 				}
-				out.println(code + "    " + instruction.getSource());
-				for (int i = 1; i < codes.length; i++) {
-					String code2 = ByteOperations.getHex(address + i, 4) + ByteOperations.getHex(codes[i], 4);
-					out.println(code2);
-					result.append("T");
-					result.append(code2);
-					result.append("\n");
+				else {
+					out.println("            " + instruction.getSource());
 				}
 				address += instruction.getDefinition().getSize();
 			}

@@ -202,6 +202,7 @@ public class Assembler {
 		int location = 0;
 		int origin = 0;
 		int lineNumber = 1;
+		boolean relocatable = false;
 		for (String line : lines) {
 		
 			if (line.charAt(0) == ';')
@@ -213,8 +214,13 @@ public class Assembler {
 				String op = line.substring(9, 14).trim();
 				String[] operands = this.getOperands(line);
 				
-				if (!label.equals("") && !op.equals(".EQU")) {
-					symbols.define(new Symbol(label, location, true));
+				if (!label.equals("")) {
+					if (symbols.hasSymbol(label)) {
+						// Error: symbol redefined
+					}
+					if (!op.equals(".EQU")) {
+						symbols.define(new Symbol(label, location, true));
+					}
 				}
 				
 				Instruction instruction = new Instruction(op, line);
@@ -222,16 +228,26 @@ public class Assembler {
 				// First check if the instruction is a psuedo-op.
 				if (op.equals(".ORIG")) {
 					instruction.setDefinition(new InstructionDefinition(".ORIG", 0, false));
-					if (operands.length > 1 || operands.length == 0) {
+					if (operands.length > 1) {
 						// Error
 					}
-					if (Operand.determineType(operands[0]) != OperandType.IMMEDIATE) {
-						// Error
-					}
+					
 					if (!label.equals("")) {
 						segmentName = String.format("%1$-6s", label); // Pad segment name if necessary
 					}
-					origin = Operand.parseConstant(operands[0]);
+					if (operands.length == 1) {
+						if (Operand.determineType(operands[0]) != OperandType.IMMEDIATE) {
+							// Error
+						}
+						else {
+							origin = Operand.parseConstant(operands[0]);
+							location = origin;
+							symbols.define(new Symbol(label, location, true));
+						}
+					}
+					else {
+						relocatable = true;
+					}
 				}
 				else if (op.equals(".EQU")) {
 					instruction.setDefinition(new InstructionDefinition(".EQU", 0, false));
@@ -251,14 +267,14 @@ public class Assembler {
 						// Error
 					}
 					OperandType type = Operand.determineType(operands[0]);
-					boolean relocatable = false;
+					boolean fillRelocatable = false;
 					if (type == OperandType.SYMBOL) {
 						if (!symbols.hasSymbol(operands[0])) {
 							// Error
 						}
 						else {
 							Symbol symbol = symbols.get(operands[0]);
-							relocatable = symbol.isRelocatable();
+							fillRelocatable = symbol.isRelocatable();
 						}
 					}
 					instruction.setOperands(operands, literals);
@@ -267,7 +283,7 @@ public class Assembler {
 							".FILL",
 							new int[] { 0x000 },
 							new OperandDefinition[] {
-								new OperandDefinition(relocatable, new OperandType[] { OperandType.IMMEDIATE, OperandType.SYMBOL }, 0, 15, 0)
+								new OperandDefinition(fillRelocatable, new OperandType[] { OperandType.IMMEDIATE, OperandType.SYMBOL }, 0, 15, 0)
 							}));
 				}
 				else if (op.equals(".STRZ")) {
@@ -326,7 +342,7 @@ public class Assembler {
 			lineNumber++;
 		}
 		literals.setOffset(location);
-		return new Program(segmentName, symbols, literals, instructions, startAddress, origin);
+		return new Program(segmentName, relocatable, symbols, literals, instructions, startAddress, origin);
 	}
 	
 	// Given an Instruction with a name and collection of Operands, finds an InstructionDefinition
