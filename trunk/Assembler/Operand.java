@@ -38,13 +38,9 @@ public class Operand {
 	
 	// Inserts the binary value of this Operand into the given instruction (ops).
 	// The given SymbolTable and LiteralTable are used to resolve the binary value
-	// of the Operand. The origin is the first address of the program; it is used to
-	// offset relocatable immediate values.
-	public void insert(int[] ops, SymbolTable symbols, LiteralTable literals, int origin) throws Exception {
+	// of the Operand.
+	public void insert(int[] ops, SymbolTable symbols, LiteralTable literals) throws Exception {
 		int x = Operand.getValue(this.value, symbols, literals);
-		if (this.definition.isRelocatable() && this.type == OperandType.IMMEDIATE) {
-			x -= origin & 0x01ff;
-		}
 		ops[this.definition.getOperationIndex()] |= this.definition.getMask() & (x << this.definition.getLeastSignificantBit());
 	}
 	
