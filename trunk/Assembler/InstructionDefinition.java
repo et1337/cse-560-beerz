@@ -22,18 +22,29 @@ public class InstructionDefinition {
 	// from source code lines.
 	private String name;
 	
+	// Represents the number of memory slots this instruction takes up.
+	// May not correspond to the size of the operations array.
+	private int size;
+	
 	// Instantiates a new default InstructionDefinition. That is, it will create a
-	// definition that maps to "numOperations" address slots. It will also create
-	// an appropriate number of OperandDefinitions, so that the value of each address
-	// slot will be completely determined by one Operand.
+	// definition that maps to numOperations address slots. If createOperands is
+	// specified, it will also create an appropriate number of OperandDefinitions,
+	// so the value of each address slot will be completely determined by one Operand.
 	// This is a convenience instruction that allows the Assembler to easily insert
 	// values directly into the program (for example, when executing .STRZ).
-	public InstructionDefinition(String name, int numOperations) {
+	public InstructionDefinition(String name, int numOperations, boolean createOperands) {
 		this.name = name;
-		this.operations = new int[numOperations];
-		this.operands = new OperandDefinition[numOperations];
-		for (int i = 0; i < numOperations; i++) {
-			this.operands[i] = new OperandDefinition(false, new OperandType[] { OperandType.IMMEDIATE }, i, 15, 0);
+		this.size = numOperations;
+		if (createOperands) {
+			this.operations = new int[numOperations];
+			this.operands = new OperandDefinition[numOperations];
+			for (int i = 0; i < numOperations; i++) {
+				this.operands[i] = new OperandDefinition(false, new OperandType[] { OperandType.IMMEDIATE }, i, 15, 0);
+			}
+		}
+		else {
+			this.operations = new int[0];
+			this.operands = new OperandDefinition[0];
 		}
 	}
 	
@@ -41,6 +52,7 @@ public class InstructionDefinition {
 	// and OperandDefinitions.
 	public InstructionDefinition(String name, int[] operations, OperandDefinition[] operands) {
 		this.name = name;
+		this.size = operations.length;
 		this.operations = operations;
 		this.operands = operands;
 	}
@@ -69,7 +81,7 @@ public class InstructionDefinition {
 	// Returns the base binary values this instruction maps to.
 	// This is the binary executable code before the Operand values are inserted.
 	public int[] getOperations() {
-		return this.operations;
+		return (int[])this.operations.clone();
 	}
 	
 	// Gets the collection of OperandDefinitions for this definition.
@@ -85,6 +97,6 @@ public class InstructionDefinition {
 	
 	// Gets the number of address slots this instruction requires.
 	public int getSize() {
-		return this.operations.length;
+		return this.size;
 	}
 }

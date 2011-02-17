@@ -59,8 +59,11 @@ public class Program {
 		
 		StringBuffer result = new StringBuffer();
 		
-		String header = "H" + this.name + ByteOperations.getHex(this.origin, 4) + ByteOperations.getHex(this.literals.getOffset() + this.literals.getEntries().size(), 4);
-		out.println(header);
+		String header = "H"
+			+ this.name
+			+ ByteOperations.getHex(this.origin, 4)
+			+ ByteOperations.getHex(this.literals.getOffset()
+			+ this.literals.getEntries().size(), 4);
 		result.append(header);
 		result.append("\n");
 		
@@ -69,8 +72,8 @@ public class Program {
 		// Output modification records. Note: modification records use bitmask format.
 		// That is, any bits that need relocated will be 1, all other bits will be 0.
 		for (Instruction instruction : this.instructions) {
-			int[] codes = new int[instruction.getDefinition().getSize()];
 			OperandDefinition[] operandDefinitions = instruction.getDefinition().getOperandDefinitions();
+			int[] codes = new int[operandDefinitions.length];
 			for (int i = 0; i < operandDefinitions.length; i++) {
 				OperandDefinition operandDefinition = operandDefinitions[i];
 				if (operandDefinition.isRelocatable()) {
@@ -85,7 +88,7 @@ public class Program {
 					result.append("\n");
 				}
 			}
-			address += codes.length;
+			address += instruction.getDefinition().getSize();
 		}
 		
 		address = 0;
@@ -109,7 +112,7 @@ public class Program {
 					result.append(code2);
 					result.append("\n");
 				}
-				address += codes.length;
+				address += instruction.getDefinition().getSize();
 			}
 			catch (Exception e) {
 				e.printStackTrace();
@@ -127,9 +130,7 @@ public class Program {
 			out.println(code);
 		}
 		
-		String end = "E" + ByteOperations.getHex(this.startAddress, 4);
-		result.append(end);
-		out.println(end);
+		result.append("E" + ByteOperations.getHex(this.startAddress, 4));
 		
 		// Return resulting code.
 		return result.toString();

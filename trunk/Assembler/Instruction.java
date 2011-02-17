@@ -30,8 +30,10 @@ public class Instruction {
 	public void setDefinition(InstructionDefinition definition) {
 		this.definition = definition;
 		OperandDefinition[] definitions = this.definition.getOperandDefinitions();
-		for (int i = 0; i < definitions.length; i++) {
-			this.operands[i].setDefinition(definitions[i]);
+		if (definitions != null) {
+			for (int i = 0; i < definitions.length; i++) {
+				this.operands[i].setDefinition(definitions[i]);
+			}
 		}
 	}
 	

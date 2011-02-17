@@ -197,6 +197,7 @@ public class Assembler {
 		SymbolTable symbols = new SymbolTable();
 		LiteralTable literals = new LiteralTable();
 		List<Instruction> instructions = new LinkedList<Instruction>();
+		String segmentName = this.getNameFromFilename(filename);
 		int startAddress = 0;
 		int location = 0;
 		int origin = 0;
@@ -220,17 +221,20 @@ public class Assembler {
 				
 				// First check if the instruction is a psuedo-op.
 				if (op.equals(".ORIG")) {
-					instruction.setDefinition(new InstructionDefinition(".ORIG", 0));
+					instruction.setDefinition(new InstructionDefinition(".ORIG", 0, false));
 					if (operands.length > 1 || operands.length == 0) {
 						// Error
 					}
 					if (Operand.determineType(operands[0]) != OperandType.IMMEDIATE) {
 						// Error
 					}
+					if (!label.equals("")) {
+						segmentName = String.format("%1$-6s", label); // Pad segment name if necessary
+					}
 					origin = Operand.parseConstant(operands[0]);
 				}
 				else if (op.equals(".EQU")) {
-					instruction.setDefinition(new InstructionDefinition(".EQU", 0));
+					instruction.setDefinition(new InstructionDefinition(".EQU", 0, false));
 					if (operands.length > 1 || operands.length == 0 || label == "") {
 						// Error
 					}
@@ -247,7 +251,7 @@ public class Assembler {
 						// Error
 					}
 					instruction.setOperands(operands, literals);
-					instruction.setDefinition(new InstructionDefinition(".FILL", 1));
+					instruction.setDefinition(new InstructionDefinition(".FILL", 1, true));
 				}
 				else if (op.equals(".STRZ")) {
 					if (operands.length > 1 || operands.length == 0) {
@@ -260,10 +264,10 @@ public class Assembler {
 					}
 					chars[stringLiteral.length()] = "x0000";
 					instruction.setOperands(chars, literals);
-					instruction.setDefinition(new InstructionDefinition(".STRZ", stringLiteral.length() + 1));
+					instruction.setDefinition(new InstructionDefinition(".STRZ", stringLiteral.length() + 1, true));
 				}
 				else if (op.equals(".END")) {
-					instruction.setDefinition(new InstructionDefinition(".END", 0));
+					instruction.setDefinition(new InstructionDefinition(".END", 0, false));
 					if (operands.length > 1) {
 						// Error
 					}
@@ -276,11 +280,11 @@ public class Assembler {
 					}
 				}
 				else if (op.equals(".BLKW")) {
-					instruction.setDefinition(new InstructionDefinition(".BLKW", 0));
 					if (operands.length > 1 || operands.length == 0) {
 						// Error
 					}
-					location += Operand.getValue(operands[0], symbols, literals);
+					int size = Operand.getValue(operands[0], symbols, literals);
+					instruction.setDefinition(new InstructionDefinition(".BLKW", size, false));
 				}
 				else {
 					// The instruction is not a pseudo-op. Look it up in the instruction definition table.
@@ -289,7 +293,7 @@ public class Assembler {
 					if (definition == null) {
 						// Error
 						System.out.println("Error: undefined operation \"" + op + "\"");
-						definition = new InstructionDefinition(op, operands.length);
+						definition = new InstructionDefinition(op, operands.length, false);
 					}
 					instruction.setDefinition(definition);
 				}
@@ -304,7 +308,7 @@ public class Assembler {
 			lineNumber++;
 		}
 		literals.setOffset(location);
-		return new Program(this.getNameFromFilename(filename), symbols, literals, instructions, startAddress, origin);
+		return new Program(segmentName, symbols, literals, instructions, startAddress, origin);
 	}
 	
 	// Given an Instruction with a name and collection of Operands, finds an InstructionDefinition
