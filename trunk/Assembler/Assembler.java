@@ -250,8 +250,25 @@ public class Assembler {
 					if (operands.length > 1 || operands.length == 0) {
 						// Error
 					}
+					OperandType type = Operand.determineType(operands[0]);
+					boolean relocatable = false;
+					if (type == OperandType.SYMBOL) {
+						if (!symbols.hasSymbol(operands[0])) {
+							// Error
+						}
+						else {
+							Symbol symbol = symbols.get(operands[0]);
+							relocatable = symbol.isRelocatable();
+						}
+					}
 					instruction.setOperands(operands, literals);
-					instruction.setDefinition(new InstructionDefinition(".FILL", 1, true));
+					instruction.setDefinition(
+						new InstructionDefinition(
+							".FILL",
+							new int[] { 0x000 },
+							new OperandDefinition[] {
+								new OperandDefinition(relocatable, new OperandType[] { OperandType.IMMEDIATE, OperandType.SYMBOL }, 0, 15, 0)
+							}));
 				}
 				else if (op.equals(".STRZ")) {
 					if (operands.length > 1 || operands.length == 0) {
@@ -264,7 +281,8 @@ public class Assembler {
 					}
 					chars[stringLiteral.length()] = "x0000";
 					instruction.setOperands(chars, literals);
-					instruction.setDefinition(new InstructionDefinition(".STRZ", stringLiteral.length() + 1, true));
+					instruction.setDefinition(
+						new InstructionDefinition(".STRZ", stringLiteral.length() + 1, true));
 				}
 				else if (op.equals(".END")) {
 					instruction.setDefinition(new InstructionDefinition(".END", 0, false));
