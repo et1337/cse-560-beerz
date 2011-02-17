@@ -9,8 +9,9 @@ package Assembler;
  * this is the binary executable code before the Operand values are inserted.
  * A collection of OperandDefinitions which specify which Operands are acceptable
  * for this instruction, and how they are to be inserted into the binary base values.
- * public class InstructionDefinition
- */ 
+ */
+  public class InstructionDefinition
+  
 {
 	
 	/**
