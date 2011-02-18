@@ -12,30 +12,19 @@ public class Main {
 	// Program entry point.
 	public static void main(String[] args) {
 		// Print usage data if necessary
-		if (args.length < 1 || args[0].equals("--help") || args[0].equals("/?")) {
+		if (args.length < 2 || args[0].equals("--help") || args[0].equals("/?")) {
 			Main.printUsageInformation();
 			return;
 		}
 		
 		String filename = args[0];
-		String outFile = null;
+		String outFile = args[1];
 		boolean generateListing = false;
 		
-		for (int i = 1; i < args.length; i++) {
+		for (int i = 2; i < args.length; i++) {
 			if (args[i].equals("-l")) {
 				// Generate a listing
 				generateListing = true;
-			}
-			else if (args[i].equals("-o")) {
-				// Set the output file
-				i++;
-				if (i < args.length) {
-					outFile = args[i];
-				}
-				else {
-					Main.printUsageInformation();
-					return;
-				}
 			}
 			else {
 				Main.printUsageInformation();
@@ -58,8 +47,9 @@ public class Main {
 	
 	// Prints usage information for users of this program.
 	private static void printUsageInformation() {
-		System.out.println("Usage:\tjava Main inputfile [options]");
-		System.out.println("\t-o outputfile\tSpecify name of output object file.");
+		System.out.println("Usage:\tjava Main inputfile outputfile [options]");
+		System.out.println("\tinputfile\tSpecify path to input assembly file.");
+		System.out.println("\toutputfile\tSpecify path to output object file.");
 		System.out.println("\t-l\t\tGenerate and display source code listing.");
 	}
 	

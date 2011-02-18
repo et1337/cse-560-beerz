@@ -69,7 +69,7 @@ public class Program {
 			+ ByteOperations.getHex(this.literals.getOffset()
 			+ this.literals.getEntries().size(), 4);
 		result.append(header);
-		result.append("\n");
+		result.append("\r\n");
 		
 		int address = this.origin;
 		
@@ -100,7 +100,7 @@ public class Program {
 								result.append("M0");
 							}
 						}
-						result.append("\n");
+						result.append("\r\n");
 					}
 				}
 				else {
@@ -120,7 +120,7 @@ public class Program {
 			String code = ByteOperations.getHex(entry.getValue() + this.literals.getOffset(), 4) + ByteOperations.getHex(entry.getKey(), 4);
 			result.append("T");
 			result.append(code);
-			result.append("\n");
+			result.append("\r\n");
 			out.println(code);
 		}
 		
