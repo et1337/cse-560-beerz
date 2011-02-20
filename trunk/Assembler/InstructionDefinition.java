@@ -11,7 +11,6 @@ package Assembler;
  * for this instruction, and how they are to be inserted into the binary base values.
  */
   public class InstructionDefinition
-  
 {
 	
 	/**
