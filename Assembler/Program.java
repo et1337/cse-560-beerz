@@ -6,33 +6,57 @@ import java.util.Map;
 import java.io.PrintStream;
 import java.io.OutputStream;
 
-// A Program contains an in-memory representation of an assembly Program, which can
-// be rendered into binary form with the getCode function.
+/**
+ *  A Program contains an in-memory representation of an assembly Program, which can be rendered into binary form with the getCode function.
+ *
+ */
 public class Program {
 	
-	// Contains the names and values of all symbols defined in this Program.
+	/**
+	 *  Contains the names and values of all symbols defined in this Program.
+	 */
 	private SymbolTable symbols;
 	
-	// Contains the addresses and values of all literals defined in this Program.
+	/**
+	 *  Contains the addresses and values of all literals defined in this Program.
+	 */
 	private LiteralTable literals;
 	
-	// Contains all Instructions (source code, binary code, and Operand values) in this Program.
+	/**
+	 *  Contains all Instructions (source code, binary code, and Operand values) in this Program.
+	 */
 	private List<Instruction> instructions;
 	
-	// The address (relative to the origin) to start execution at.
+	/**
+	 *  The address (relative to the origin) to start execution at.
+	 */
 	private int startAddress;
 	
-	// The absolute address of the first memory slot used by the Program. Any relocatable
-	// values in the Program are offset by this address.
+	/**
+	 *  The absolute address of the first memory slot used by the Program. Any relocatable values in the Program are offset by this address.
+	 */
 	private int origin;
 	
-	// Name for the program. Used as the segment name in the header record.
+	/**
+	 *  Name for the program. Used as the segment name in the header record.
+	 */
 	private String name;
 	
-	// True if the program is relocatable.
+	/**
+	 *  True if the program is relocatable.
+	 */
 	private boolean isRelocatable;
 	
-	// Instantiates a new Program with the given data.
+	/**
+	 *  Instantiates a new Program with the given data.
+	 * @param name the name of the program
+	 * @param isRelocatable a boolean that indicates whether the program is relocatable or not
+	 * @param symbols a Symboltable of the program's contained symbols
+	 * @param literals a LiteralTable of the program's contained literals
+	 * @param instructions a List of the program's instructions
+	 * @param startAddress the starting address of the program
+	 * @param origin the origin of the program
+	 */
 	public Program(String name, boolean isRelocatable, SymbolTable symbols, LiteralTable literals, List<Instruction> instructions, int startAddress, int origin) {
 		this.name = name;
 		this.isRelocatable = isRelocatable;
@@ -43,8 +67,11 @@ public class Program {
 		this.origin = origin;
 	}
 	
-	// Gets the object code for this Program, optionally displaying a
-	// listing for the user.
+	/**
+	 *  Gets the object code for this Program, optionally displaying a listing for the user.
+	 * @param printListing a boolean to determine whether or not to print a program listing
+	 * @return a String representing the object file
+	 */
 	public String getCode(boolean printListing) {
 	
 		PrintStream out = null;
@@ -113,7 +140,7 @@ public class Program {
 			}
 		}
 		
-		// Output literal table.
+		// Output literal table. 
 		Iterator<Map.Entry<Integer, Integer>> entryIterator = this.literals.getEntries().iterator();
 		while (entryIterator.hasNext()) {
 			Map.Entry<Integer, Integer> entry = entryIterator.next();
