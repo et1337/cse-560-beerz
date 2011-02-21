@@ -1,6 +1,5 @@
-;2345678901234567890123456890
-; Example Program
-Lab2EG   .ORIG   xFFFF
+; Sample program
+Lab2EG   .ORIG   x30B0
 count    .FILL   #4
 Begin    LD      ACC,count       ;R1 <- 4
          LEA     R0,msg

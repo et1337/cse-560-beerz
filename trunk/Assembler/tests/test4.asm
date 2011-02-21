@@ -1,6 +1,5 @@
-;2345678901234567890123456890
-; Example Program
-Lab2EG   .ORIG   x30B0
+; Starts the loading the program at the end of memory; this should not assemble.
+Lab2EG   .ORIG   xFFFF
 count    .FILL   #4
 Begin    LD      ACC,count       ;R1 <- 4
          LEA     R0,msg

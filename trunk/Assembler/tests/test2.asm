@@ -1,4 +1,5 @@
-; Example Program
+; Tests multiple instructions of the same type.
+; (see the two LEA instructions)
 Lab2EG   .ORIG   x30B0
 count    .FILL   #4
 Begin    LD      ACC,count    ;R1 <- 4
