@@ -217,7 +217,7 @@ public class Assembler {
 	 * @param data
 	 * @return the assembled program
 	 */
-	public Program assemble(String filename, String data) {
+	public Program assemble(String filename, String data) throws Exception {
 		String[] lines = data.split("\n");
 		SymbolTable symbols = new SymbolTable();
 		LiteralTable literals = new LiteralTable();
@@ -392,9 +392,7 @@ public class Assembler {
 			lineNumber++;
 		}
 		literals.setOffset(location);
-		return new Program(segmentName, relocatable, symbols, literals,
-				instructions, startAddress, origin);
-				
+						
 		if(errors.size() > 0) {
 			//Output each error message that we have encountered
 			StringBuffer msg = new StringBuffer();
@@ -410,6 +408,9 @@ public class Assembler {
 			}
 			throw new Exception(msg.toString());
 		}
+		
+		return new Program(segmentName, relocatable, symbols, literals,
+				instructions, startAddress, origin);
 	}
 
 	/**

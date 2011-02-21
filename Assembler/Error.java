@@ -1,6 +1,6 @@
 package Assembler;
 
-public static class Error {
+public class Error {
 	/**
 	 * Line number associated with this error. Optional.
 	 */
