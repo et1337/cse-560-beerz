@@ -16,7 +16,13 @@ public class Assembler {
 	 * table.
 	 */
 	private InstructionDefinition[] instructionDefinitions;
-
+	
+	
+	/**
+	* List of errors encountered in assembly. 
+	*/
+	List<Error> errors = new LinkedList<Error>();
+	
 	/**
 	 * Instantiates a new Assembler. Initializes the instruction definition
 	 * table.
@@ -236,6 +242,7 @@ public class Assembler {
 				if (!label.equals("")) {
 					if (symbols.hasSymbol(label)) {
 						// Error: symbol redefined
+						errors.add(new Error(lineNumber, "Symbol redefinition is not allowed."));
 					}
 					if (!op.equals(".EQU")) {
 						symbols.define(new Symbol(label, location, true));
@@ -250,6 +257,8 @@ public class Assembler {
 							".ORIG", 0, false));
 					if (operands.length > 1) {
 						// Error
+						errors.add(new Error(".ORIG may have a maximum of one operand; " 
+						+ Integer.toString(operands.length) + " operands were given."));
 					}
 
 					if (!label.equals("")) {
@@ -262,6 +271,7 @@ public class Assembler {
 					if (operands.length == 1) {
 						if (Operand.determineType(operands[0]) != OperandType.IMMEDIATE) {
 							// Error
+							errors.add(new Error(lineNumber, "Operand of .ORIG must be an immediate value."));
 						} else {
 							origin = Operand.parseConstant(operands[0]);
 							location = origin;
@@ -276,6 +286,8 @@ public class Assembler {
 					if (operands.length > 1 || operands.length == 0
 							|| label == "") {
 						// Error
+						errors.add(new Error(lineNumber, "Incorrect usage of .EQU." + 
+						" Requires a label and only one operand."));
 					}
 					OperandType type = Operand.determineType(operands[0]);
 					if (type == OperandType.SYMBOL) {
@@ -287,12 +299,15 @@ public class Assembler {
 				} else if (op.equals(".FILL")) {
 					if (operands.length > 1 || operands.length == 0) {
 						// Error
+						errors.add(new Error(lineNumber, ".FILL requires one operand. " 
+						+ Integer.toString(operands.length) + " were given."));
 					}
 					OperandType type = Operand.determineType(operands[0]);
 					boolean fillRelocatable = false;
 					if (type == OperandType.SYMBOL) {
 						if (!symbols.hasSymbol(operands[0])) {
 							// Error
+							errors.add(new Error(lineNumber, "Symbol referenced in operand not defined."));
 						} else {
 							Symbol symbol = symbols.get(operands[0]);
 							fillRelocatable = symbol.isRelocatable();
@@ -308,6 +323,8 @@ public class Assembler {
 				} else if (op.equals(".STRZ")) {
 					if (operands.length > 1 || operands.length == 0) {
 						// Error
+						errors.add(new Error(lineNumber, ".STRZ requires one operand. " 
+						+ Integer.toString(operands.length) + " were given."));
 					}
 					String stringLiteral = operands[0];
 					String[] chars = new String[stringLiteral.length() + 1];
@@ -323,8 +340,10 @@ public class Assembler {
 				} else if (op.equals(".END")) {
 					instruction.setDefinition(new InstructionDefinition(".END",
 							0, false));
-					if (operands.length > 1) {
+					if (operands.length > 1 || operands.length == 0) {
 						// Error
+						errors.add(new Error(".END requires only one operand. " 
+						+ Integer.toString(operands.length)+ " were given."));
 					}
 					if (operands.length == 1) {
 						OperandType type = Operand.determineType(operands[0]);
@@ -337,6 +356,8 @@ public class Assembler {
 				} else if (op.equals(".BLKW")) {
 					if (operands.length > 1 || operands.length == 0) {
 						// Error
+						errors.add(new Error(lineNumber, ".BLKW requires one operand.  "
+						+ operands.length + " were given."));
 					}
 					int size = Operand.getValue(operands[0], symbols, literals);
 					instruction.setDefinition(new InstructionDefinition(
@@ -349,10 +370,13 @@ public class Assembler {
 							.getInstructionDefinition(instruction);
 					if (definition == null) {
 						// Error
-						System.out.println("Error: undefined operation \"" + op
-								+ "\"");
+						//System.out.println("Error: undefined operation \"" + op
+						//		+ "\"");
+						errors.add(new Error(lineNumber, "Undefined operation \"" + op
+						+ "\""));
 						definition = new InstructionDefinition(op,
 								operands.length, false);
+						
 					}
 					instruction.setDefinition(definition);
 				}
@@ -360,15 +384,32 @@ public class Assembler {
 				instructions.add(instruction);
 			} catch (Exception e) {
 				// Error handling
-				System.out.println("Error on line "
-						+ Integer.toString(lineNumber) + ": ");
-				e.printStackTrace();
+				// System.out.println("Error on line "
+						// + Integer.toString(lineNumber) + ": ");
+				// e.printStackTrace();
+				errors.add(new Error(lineNumber, e.getMessage()));
 			}
 			lineNumber++;
 		}
 		literals.setOffset(location);
 		return new Program(segmentName, relocatable, symbols, literals,
 				instructions, startAddress, origin);
+				
+		if(errors.size() > 0) {
+			//Output each error message that we have encountered
+			StringBuffer msg = new StringBuffer();
+			for(Error e : errors) {
+				msg.append("Assemble error: ");
+				if(e.hasLineNumber()) {
+					msg.append("Line ");
+					msg.append(Integer.toString(e.getLineNumber()));
+					msg.append(" - ");
+				}
+				msg.append(e.getMessage());
+				msg.append("\n");
+			}
+			throw new Exception(msg.toString());
+		}
 	}
 
 	/**
