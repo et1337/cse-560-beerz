@@ -93,7 +93,7 @@ public class Program {
 		String header = "H"
 			+ this.name
 			+ ByteOperations.getHex(this.origin, 4)
-			+ ByteOperations.getHex(this.literals.getOffset()
+			+ ByteOperations.getHex(this.literals.getOffset() - this.origin
 			+ this.literals.getEntries().size(), 4);
 		result.append(header);
 		result.append("\r\n");
