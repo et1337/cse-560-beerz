@@ -78,4 +78,32 @@ public class ByteOperations {
 	public static boolean getBit(int value, int index) {
 		return ((value >> index) & 1) == 1;
 	}
+	
+	/**
+	 * Extends the sign bit from the given most significant bit.
+	 * @param value the input value to sign extend
+	 * @param mostSignificantBit the index of the sign bit
+	 * @return the sign-extended version of the given input value
+	 */
+	public static int extendSign(int value, int mostSignificantBit)
+		throws Exception {
+		
+		// Make sure the number isn't a positive number larger than
+		// we're allowed to have.
+		if (!ByteOperations.getBit(value, 31)) {
+			for (int i = 30; i > mostSignificantBit; i--) {
+				if (ByteOperations.getBit(value, i)) {
+					throw new Exception("Operand " + Integer.toString(value) + " out of bounds.");
+				}
+			}
+		}
+		
+		if (ByteOperations.getBit(value, mostSignificantBit)) {
+			// Extend the sign bit
+			for (int i = mostSignificantBit; i < 32; i++) {
+				value |= 1 << i;
+			}
+		}
+		return value;
+	}
 }

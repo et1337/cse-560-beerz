@@ -12,6 +12,21 @@ import java.util.ArrayList;
 public class Assembler {
 
 	/**
+	 * The maximum number of symbols a program is allowed to define.
+	 */
+	protected static final int MAX_SYMBOLS = 100;
+	
+	/**
+	 * The maximum number of literals a program is allwoed to define.
+	 */
+	protected static final int MAX_LITERALS = 50;
+	
+	/**
+	 * The maximum number of source records a program is allowed to compile to.
+	 */
+	protected static final int MAX_SOURCE_RECORDS = 200;
+
+	/**
 	 * Assembles the given code into a Program.
 	 * 
 	 * @param filename the file name of the source code
@@ -21,7 +36,7 @@ public class Assembler {
 	public Program assemble(String filename, String data) throws Exception {
 		List<Error> errors = new LinkedList<Error>();
 	
-		String[] lines = data.split("\n");
+		
 		SymbolTable symbols = new SymbolTable();
 		LiteralTable literals = new LiteralTable();
 		List<Instruction> instructions = new LinkedList<Instruction>();
@@ -31,14 +46,21 @@ public class Assembler {
 		int origin = 0;
 		int lineNumber = 1;
 		boolean relocatable = false;
+		boolean hasOrig = false;
+		boolean hasEnd = false;
+		
+		String[] lines = data.split("\n");
 		for (String line : lines) {
 
-			if (line.charAt(0) == ';')
+			if (line.length() >= 1 && line.charAt(0) == ';') {
+				lineNumber++;
 				continue; // Skip comment lines
+			}
 
 			try {
 
-				String label = line.substring(0, 7).trim();
+				// Extract the label
+				String label = line.length() >= 8 ? line.substring(0, 7).trim() : "";
 				
 				// Check for spacing errors.
 				String space1 = line.length() >= 9 ? line.substring(7, 9).trim() : "";
@@ -48,7 +70,7 @@ public class Assembler {
 					errors.add(new Error(lineNumber, "Incorrect spacing."));
 				}
 				
-				String op = line.substring(9, Math.min(line.length(), 14)).trim();
+				String op = line.length() > 9 ? line.substring(9, Math.min(line.length(), 14)).trim() : "";
 				String[] operands = this.getOperands(line);
 
 				if (!label.equals("")) {
@@ -65,6 +87,18 @@ public class Assembler {
 
 				// First check if the instruction is a psuedo-op.
 				if (op.equals(".ORIG")) {
+				
+					if (hasOrig) {
+						// Can't have multiple .ORIG instructions
+						errors.add(new Error(lineNumber, "Multiple .ORIG instructions are not allowed."));
+					}
+					hasOrig = true;
+					
+					if (instructions.size() > 0) {
+						// .ORIG must be first instruction
+						errors.add(new Error(lineNumber, ".ORIG instruction must be first non-comment line."));
+					}
+					
 					instruction.setDefinition(new InstructionDefinition(
 							".ORIG", 0, false));
 					if (operands.length > 1) {
@@ -74,11 +108,8 @@ public class Assembler {
 					}
 
 					if (!label.equals("")) {
-						segmentName = String.format("%1$-6s", label); // Pad
-																		// segment
-																		// name
-																		// if
-																		// necessary
+						// Pad segment name if necessary
+						segmentName = String.format("%1$-6s", label);
 					}
 					if (operands.length == 1) {
 						if (Operand.determineType(operands[0]) != OperandType.IMMEDIATE) {
@@ -98,15 +129,19 @@ public class Assembler {
 					if (operands.length != 1 || label == "") {
 						// Error
 						errors.add(new Error(lineNumber, "Incorrect usage of .EQU." + 
-						" Requires a label and one operand."));
+							" Requires a label and one operand."));
 					}
 					else {
 						OperandType type = Operand.determineType(operands[0]);
 						if (type == OperandType.SYMBOL) {
 							symbols.define(label, operands[0]);
-						} else {
+						} else if (type == OperandType.IMMEDIATE) {
 							symbols.define(new Symbol(label, Operand
 									.parseConstant(operands[0]), false));
+						} else {
+							// Error
+							errors.add(new Error(lineNumber, ".EQU operand must be a symbol " +
+								" or a constant value."));
 						}
 					}
 				} else if (op.equals(".FILL")) {
@@ -150,18 +185,28 @@ public class Assembler {
 						if (type != OperandType.STRING) {
 							errors.add(new Error(lineNumber, "Incorrect operand type for .STRZ operation."));
 						}
+						// Remove quotes
+						stringLiteral = stringLiteral.substring(1, stringLiteral.length() - 1);
+						
+						// Create character operands
 						String[] chars = new String[stringLiteral.length() + 1];
 						for (int i = 0; i < stringLiteral.length(); i++) {
 							chars[i] = "x"
 									+ ByteOperations.getHex(
 											(int) stringLiteral.charAt(i), 4);
 						}
-						chars[stringLiteral.length()] = "x0000";
+						chars[stringLiteral.length()] = "x0000"; // Null terminator
+						
 						instruction.setOperands(chars, literals);
 						instruction.setDefinition(new InstructionDefinition(
 								".STRZ", stringLiteral.length() + 1, true));
 					}
 				} else if (op.equals(".END")) {
+					if (hasEnd) {
+						// Can't have multiple .END instructions
+						errors.add(new Error(lineNumber, "Multiple .END instructions are not allowed."));
+					}
+					hasEnd = true;
 					instruction.setOperands(operands, literals);
 					instruction.setDefinition(new InstructionDefinition(
 						".END", new int[] { },
@@ -207,20 +252,24 @@ public class Assembler {
 					}
 					instruction.setDefinition(definition);
 				}
+				
 				if (instruction.getDefinition() != null) {
 					location += instruction.getDefinition().getSize();
 				}
+				
 				instructions.add(instruction);
+				
 			} catch (Exception e) {
 				// Error handling
 				errors.add(new Error(lineNumber, e.getMessage()));
 			}
+			
 			lineNumber++;
 		}
 		literals.setOffset(location);
 		
 		int lastAddress = literals.getOffset() + literals.getEntries().size();
-		if ((origin & 0xFFFFFE00) != (lastAddress & 0xFFFFFE00)) {
+		if ((origin & 0xFFFFF800) != (lastAddress & 0xFFFFF800)) {
 			errors.add(new Error("Program spans multiple memory pages. Relocate or shrink the program to fit inside one memory page."));
 		}
 		
@@ -228,8 +277,24 @@ public class Assembler {
 			errors.add(new Error("Program loads into memory outside the addressable range."));
 		}
 		
+		if (symbols.size() > Assembler.MAX_SYMBOLS) {
+			errors.add(new Error("Program exceeds limit for maximum number of symbols."));
+		}
+		
+		if (literals.getEntries().size() > Assembler.MAX_LITERALS) {
+			errors.add(new Error("Program exceeds limit for maximum number of literals."));
+		}
+		
+		if (lastAddress - origin > Assembler.MAX_SOURCE_RECORDS) {
+			errors.add(new Error("Program exceeds limit for maximum number of source records."));
+		}
+		
+		if (!hasOrig || !hasEnd) {
+			errors.add(new Error("Program is missing .ORIG and/or .END instructions."));
+		}
+		
 		if (errors.size() > 0) {
-			//Output each error message that we have encountered
+			// Output each error message that we have encountered
 			StringBuffer msg = new StringBuffer();
 			for(Error e : errors) {
 				msg.append("Assemble error: ");
@@ -282,15 +347,15 @@ public class Assembler {
 		for (int i = 0; i < trimmed.length(); i++) {
 			char c = trimmed.charAt(i);
 			if (inQuotes) {
+				currentOperand += c;
 				if (c == '"') {
 					inQuotes = false;
 					result.add(currentOperand);
 					currentOperand = "";
-				} else {
-					currentOperand += c;
 				}
 			} else {
 				if (c == '"') {
+					currentOperand += c;
 					inQuotes = true;
 				} else if (c == ';') {
 					break;

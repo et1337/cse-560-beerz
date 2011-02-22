@@ -169,6 +169,9 @@ public class OperandDefinition {
 	 * @return a boolean indicating whether this definition accepts signed Operand values.
 	 */
 	public boolean isSigned() {
+		if (this.isRelocatable()) {
+			return false;
+		}
 		for (OperandType type : this.acceptableTypes) {
 			if (type == OperandType.LITERAL || type == OperandType.IMMEDIATE) {
 				return true;

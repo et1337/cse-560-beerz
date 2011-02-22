@@ -114,6 +114,22 @@ public class Operand {
 		}
 	}
 	
+	/**
+	 * Gets the binary Operand value represented by the given string. The
+	 * SymbolTable and LiteralTable are used to resolve the binary value. Note:
+	 * relocatable immediate values are NOT relocated by this function.
+	 * No OperandDefinition is taken in this version, so no sanity
+	 * checking is done.
+	 * 
+	 * @param value
+	 *            the String representation of an Operand
+	 * @param symbols
+	 *            the SymbolTable used by the Operand
+	 * @param literals
+	 *            the Literaltable used by the Operand
+	 * @return the value of the Operand
+	 * @throws Exception
+	 */
 	public static int getValue(String value, SymbolTable symbols,
 			LiteralTable literals) throws Exception {
 		return Operand.getValue(value, symbols, null, literals);
@@ -171,10 +187,16 @@ public class Operand {
 					throw new Exception("Undefined symbol \"" + value + "\".");
 				}
 				break;
+			case STRING:
+				throw new Exception("Invalid string operand.");
 		}
 		if (definition != null) {
-			if (result > definition.getMaximumAllowedValue() || result < definition.getMinimumAllowedValue()) {
+			if ((type == OperandType.IMMEDIATE || !definition.isRelocatable())
+				&& (result > definition.getMaximumAllowedValue() || result < definition.getMinimumAllowedValue())) {
 				throw new Exception("Operand value \"" + value + "\" (" + Integer.toString(result) + ") is out of bounds.");
+			}
+			if (definition.isSigned()) {
+				result = ByteOperations.extendSign(result, definition.getMostSignificantBit());
 			}
 		}
 		return result;
@@ -200,7 +222,7 @@ public class Operand {
 		if (firstCharacter == '#') {
 			result = Integer.valueOf(v, 10);
 		} else if (firstCharacter == 'x') {
-			result = ByteOperations.parseHex(v);
+			result = ByteOperations.extendSign(ByteOperations.parseHex(v), 15);
 		} else if (firstCharacter == 'R') {
 			result = Integer.valueOf(v, 10);
 		} else {
