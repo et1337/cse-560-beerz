@@ -236,6 +236,15 @@ public class Assembler {
 			try {
 
 				String label = line.substring(0, 7).trim();
+				
+				// Check for spacing errors.
+				String space1 = line.length() >= 9 ? line.substring(7, 9).trim() : "";
+				String space2 = line.length() >= 17 ? line.substring(14, 17).trim() : "";
+				if (!space1.equals("") || !space2.equals("")) {
+					// Should be blank spaces between label, operation, and operands.
+					errors.add(new Error(lineNumber, "Incorrect spacing."));
+				}
+				
 				String op = line.substring(9, 14).trim();
 				String[] operands = this.getOperands(line);
 
@@ -283,83 +292,97 @@ public class Assembler {
 				} else if (op.equals(".EQU")) {
 					instruction.setDefinition(new InstructionDefinition(".EQU",
 							0, false));
-					if (operands.length > 1 || operands.length == 0
-							|| label == "") {
+					if (operands.length != 1 || label == "") {
 						// Error
 						errors.add(new Error(lineNumber, "Incorrect usage of .EQU." + 
-						" Requires a label and only one operand."));
+						" Requires a label and one operand."));
 					}
-					OperandType type = Operand.determineType(operands[0]);
-					if (type == OperandType.SYMBOL) {
-						symbols.define(label, operands[0]);
-					} else {
-						symbols.define(new Symbol(label, Operand
-								.parseConstant(operands[0]), false));
+					else {
+						OperandType type = Operand.determineType(operands[0]);
+						if (type == OperandType.SYMBOL) {
+							symbols.define(label, operands[0]);
+						} else {
+							symbols.define(new Symbol(label, Operand
+									.parseConstant(operands[0]), false));
+						}
 					}
 				} else if (op.equals(".FILL")) {
-					if (operands.length > 1 || operands.length == 0) {
+					if (operands.length != 1) {
 						// Error
 						errors.add(new Error(lineNumber, ".FILL requires one operand. " 
 						+ Integer.toString(operands.length) + " were given."));
 					}
-					OperandType type = Operand.determineType(operands[0]);
-					boolean fillRelocatable = false;
-					if (type == OperandType.SYMBOL) {
-						if (!symbols.hasSymbol(operands[0])) {
-							// Error
-							errors.add(new Error(lineNumber, "Symbol referenced in operand not defined."));
-						} else {
-							Symbol symbol = symbols.get(operands[0]);
-							fillRelocatable = symbol.isRelocatable();
+					else {
+						OperandType type = Operand.determineType(operands[0]);
+						boolean fillRelocatable = false;
+						if (type == OperandType.SYMBOL) {
+							if (!symbols.hasSymbol(operands[0])) {
+								// Error
+								errors.add(new Error(lineNumber, "Symbol referenced in operand not defined."));
+							} else {
+								Symbol symbol = symbols.get(operands[0]);
+								fillRelocatable = symbol.isRelocatable();
+							}
 						}
-					}
-					instruction.setOperands(operands, literals);
-					instruction.setDefinition(new InstructionDefinition(
-							".FILL", new int[] { 0x000 },
-							new OperandDefinition[] { new OperandDefinition(
-									fillRelocatable, new OperandType[] {
+						instruction.setOperands(operands, literals);
+						instruction.setDefinition(new InstructionDefinition(
+								".FILL", new int[] { 0x000 },
+								new OperandDefinition[] { new OperandDefinition(
+										fillRelocatable, new OperandType[] {
 											OperandType.IMMEDIATE,
 											OperandType.SYMBOL }, 0, 15, 0) }));
+						if (!instruction.getDefinition().isAcceptable(instruction)) {
+							errors.add(new Error(lineNumber, "Incorrect operands for .FILL operation."));
+						}
+					}
 				} else if (op.equals(".STRZ")) {
-					if (operands.length > 1 || operands.length == 0) {
+					if (operands.length != 1) {
 						// Error
 						errors.add(new Error(lineNumber, ".STRZ requires one operand. " 
 						+ Integer.toString(operands.length) + " were given."));
 					}
-					String stringLiteral = operands[0];
-					String[] chars = new String[stringLiteral.length() + 1];
-					for (int i = 0; i < stringLiteral.length(); i++) {
-						chars[i] = "x"
-								+ ByteOperations.getHex(
-										(int) stringLiteral.charAt(i), 4);
-					}
-					chars[stringLiteral.length()] = "x0000";
-					instruction.setOperands(chars, literals);
-					instruction.setDefinition(new InstructionDefinition(
-							".STRZ", stringLiteral.length() + 1, true));
-				} else if (op.equals(".END")) {
-					instruction.setDefinition(new InstructionDefinition(".END",
-							0, false));
-					if (operands.length > 1 || operands.length == 0) {
-						// Error
-						errors.add(new Error(".END requires only one operand. " 
-						+ Integer.toString(operands.length)+ " were given."));
-					}
-					if (operands.length == 1) {
-						OperandType type = Operand.determineType(operands[0]);
-						startAddress = Operand.getValue(operands[0], symbols,
-								literals);
-						if (type == OperandType.IMMEDIATE) {
-							startAddress -= origin & 0x01ff;
+					else {
+						String stringLiteral = operands[0];
+						OperandType type = Operand.determineType(stringLiteral);
+						if (type != OperandType.STRING) {
+							errors.add(new Error(lineNumber, "Incorrect operand type for .STRZ operation."));
 						}
+						String[] chars = new String[stringLiteral.length() + 1];
+						for (int i = 0; i < stringLiteral.length(); i++) {
+							chars[i] = "x"
+									+ ByteOperations.getHex(
+											(int) stringLiteral.charAt(i), 4);
+						}
+						chars[stringLiteral.length()] = "x0000";
+						instruction.setOperands(chars, literals);
+						instruction.setDefinition(new InstructionDefinition(
+								".STRZ", stringLiteral.length() + 1, true));
 					}
+				} else if (op.equals(".END")) {
+					instruction.setOperands(operands, literals);
+					instruction.setDefinition(new InstructionDefinition(
+						".END", new int[] { },
+						new OperandDefinition[] { new OperandDefinition(
+							true, new OperandType[] {
+								OperandType.IMMEDIATE,
+								OperandType.SYMBOL }, 0, 0) }));
+					startAddress = Operand.getValue(operands[0], symbols,
+						instruction.getDefinition().getOperandDefinitions()[0], literals);
 				} else if (op.equals(".BLKW")) {
-					if (operands.length > 1 || operands.length == 0) {
+					int size = 0;
+					if (operands.length != 1) {
 						// Error
 						errors.add(new Error(lineNumber, ".BLKW requires one operand.  "
 						+ operands.length + " were given."));
 					}
-					int size = Operand.getValue(operands[0], symbols, literals);
+					else {
+						size = Operand.getValue(operands[0], symbols, new OperandDefinition(
+								false, new OperandType[] {
+									OperandType.IMMEDIATE,
+									OperandType.SYMBOL },
+								0, 0),
+							literals);
+					}
 					instruction.setDefinition(new InstructionDefinition(
 							".BLKW", size, false));
 				} else {
@@ -370,30 +393,35 @@ public class Assembler {
 							.getInstructionDefinition(instruction);
 					if (definition == null) {
 						// Error
-						//System.out.println("Error: undefined operation \"" + op
-						//		+ "\"");
-						errors.add(new Error(lineNumber, "Undefined operation \"" + op
-						+ "\""));
+						errors.add(new Error(lineNumber, "Could not find definition for " +
+						"operation \"" + op + "\" with matching operands."));
 						definition = new InstructionDefinition(op,
 								operands.length, false);
-						
 					}
 					instruction.setDefinition(definition);
 				}
-				location += instruction.getDefinition().getSize();
+				if (instruction.getDefinition() != null) {
+					location += instruction.getDefinition().getSize();
+				}
 				instructions.add(instruction);
 			} catch (Exception e) {
 				// Error handling
-				// System.out.println("Error on line "
-						// + Integer.toString(lineNumber) + ": ");
-				// e.printStackTrace();
 				errors.add(new Error(lineNumber, e.getMessage()));
 			}
 			lineNumber++;
 		}
 		literals.setOffset(location);
-						
-		if(errors.size() > 0) {
+		
+		int lastAddress = literals.getOffset() + literals.getEntries().size();
+		if ((origin & 0xFFFFFE00) != (lastAddress & 0xFFFFFE00)) {
+			errors.add(new Error("Program spans multiple memory pages. Relocate or shrink the program to fit inside one memory page."));
+		}
+		
+		if (origin < 0 || lastAddress > 0xFFFF) {
+			errors.add(new Error("Program loads into memory outside the addressable range."));
+		}
+		
+		if (errors.size() > 0) {
 			//Output each error message that we have encountered
 			StringBuffer msg = new StringBuffer();
 			for(Error e : errors) {
@@ -439,8 +467,8 @@ public class Assembler {
 	 * @param line the line of code to extract the value of the Operands from
 	 * @return an array of strings containing the Operands
 	 */
-	protected String[] getOperands(String line) {
-		String trimmed = line.substring(17).trim();
+	protected String[] getOperands(String line) throws Exception {
+		String trimmed = line.length() >= 17 ? line.substring(17).trim() : "";
 		ArrayList<String> result = new ArrayList<String>();
 		boolean inQuotes = false;
 		String currentOperand = "";
@@ -466,6 +494,10 @@ public class Assembler {
 					currentOperand += c;
 				}
 			}
+		}
+		if (inQuotes) {
+			// Un-closed quotes
+			throw new Exception("Detected string operand with unclosed quotation mark.");
 		}
 		if (!currentOperand.trim().equals("")) {
 			result.add(currentOperand.trim());

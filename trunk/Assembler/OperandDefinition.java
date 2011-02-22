@@ -92,7 +92,18 @@ public class OperandDefinition {
 	 * @return true if and only the Operand is valid
 	 */
 	public boolean isAcceptable(Operand operand) {
-		return Arrays.asList(this.acceptableTypes).contains(operand.getType());
+		return this.isAcceptable(operand.getType());
+	}
+	
+	/**
+	 * Returns true if the given OperandType is contained in this
+	 * definition's collection of acceptable OperandTypes.
+	 * 
+	 * @param operand the OperandType to be checked
+	 * @return true if and only the OperandType is valid
+	 */
+	public boolean isAcceptable(OperandType type) {
+		return Arrays.asList(this.acceptableTypes).contains(type);
 	}
 
 	/**

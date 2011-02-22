@@ -99,9 +99,16 @@ public class Operand {
 			return OperandType.IMMEDIATE;
 		} else if (firstCharacter == 'R') {
 			return OperandType.REGISTER;
+		} else if (firstCharacter == '"') {
+			return OperandType.STRING;
 		} else {
 			return OperandType.SYMBOL;
 		}
+	}
+	
+	public static int getValue(String value, SymbolTable symbols,
+			LiteralTable literals) throws Exception {
+		return Operand.getValue(value, symbols, null, literals);
 	}
 
 	/**
@@ -113,31 +120,44 @@ public class Operand {
 	 *            the String representation of an Operand
 	 * @param symbols
 	 *            the SymbolTable used by the Operand
+	 * @param definition
+	 *            optional definition of the Operand
 	 * @param literals
 	 *            the Literaltable used by the Operand
 	 * @return the value of the Operand
 	 * @throws Exception
 	 */
 	public static int getValue(String value, SymbolTable symbols,
-			LiteralTable literals) throws Exception {
+			OperandDefinition definition, LiteralTable literals)
+			throws Exception {
 		OperandType type = Operand.determineType(value);
-		switch (type) {
-		case LITERAL:
-			return literals.getAddress(Operand.parseConstant(value));
-		case IMMEDIATE:
-			return Operand.parseConstant(value);
-		case REGISTER:
-			return Operand.parseConstant(value);
-		case SYMBOL:
-			if (symbols.hasSymbol(value)) {
-				// if (symbol.isRelocatable() &&
-				// !this.definition.isRelocatable()) {
-				// // Error
-				// }
-				return symbols.get(value).getValue();
-			} else {
-				// Error: undefined symbol
+		if (definition != null) {
+			if (!definition.isAcceptable(type)) {
+				throw new Exception("Incorrect operand type for operand \"" + value + "\".");
 			}
+		}
+		switch (type) {
+			case LITERAL:
+				return literals.getAddress(Operand.parseConstant(value));
+			case IMMEDIATE:
+				return Operand.parseConstant(value);
+			case REGISTER:
+				return Operand.parseConstant(value);
+			case SYMBOL:
+				if (symbols.hasSymbol(value)) {
+					Symbol symbol = symbols.get(value);
+					if (symbol.isRelocatable()
+						&& (definition != null &&
+						!definition.isRelocatable())) {
+						// Error: attempting to using a relocatable symbol for a
+						// non-relocatable operand.
+						throw new Exception("Relocatable symbol \"" +
+							value + "\" can not be used in a non-relocatable operand.");
+					}
+					return symbol.getValue();
+				} else {
+					throw new Exception("Undefined symbol \"" + value + "\".");
+				}
 		}
 		return 0;
 	}
@@ -153,19 +173,20 @@ public class Operand {
 	 */
 	public static int parseConstant(String value) throws Exception {
 		int result = 0;
-		if (value.charAt(0) == '=') {
-			value = value.substring(1);
+		String v = new String(value);
+		if (v.charAt(0) == '=') {
+			v = v.substring(1);
 		}
-		char firstCharacter = value.charAt(0);
-		value = value.substring(1);
+		char firstCharacter = v.charAt(0);
+		v = v.substring(1);
 		if (firstCharacter == '#') {
-			result = Integer.valueOf(value, 10);
+			result = Integer.valueOf(v, 10);
 		} else if (firstCharacter == 'x') {
-			result = ByteOperations.parseHex(value);
+			result = ByteOperations.parseHex(v);
 		} else if (firstCharacter == 'R') {
-			result = Integer.valueOf(value, 10);
+			result = Integer.valueOf(v, 10);
 		} else {
-			// Error
+			throw new Exception("Failed to parse immediate operand \"" + value + "\".");
 		}
 		return result;
 	}

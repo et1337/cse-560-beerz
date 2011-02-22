@@ -23,7 +23,11 @@ public class SymbolTable {
 	 * @param alias 
 	 * @param target
 	 */
-	public void define(String alias, String target) {
+	public void define(String alias, String target)
+		throws Exception {
+		if (alias.equals(target)) {
+			throw new Exception("Cannot alias a symbol to itself.");
+		}
 		Symbol symbol = this.get(target);
 		this.define(new Symbol(alias, symbol.getValue(), symbol.isRelocatable()));
 	}
