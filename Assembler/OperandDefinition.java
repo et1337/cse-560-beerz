@@ -139,6 +139,43 @@ public class OperandDefinition {
 	public int getLeastSignificantBit() {
 		return this.leastSignificant;
 	}
+	
+	/**
+	 * Gets the minimum value this definition's Operands are allowed to have.
+	 * @return an integer representing the minimum allowed Operand value.
+	 */
+	public int getMinimumAllowedValue() {
+		if (this.isSigned()) {
+			return -1 * (int)Math.pow(2, (this.mostSignificant - this.leastSignificant) + 1 - 1);
+		} else {
+			return 0;
+		}
+	}
+	
+	/**
+	 * Gets the maximum value this definition's Operands are allowed to have.
+	 * @return an integer representing the maximum allowed Operand value.
+	 */
+	public int getMaximumAllowedValue() {
+		if (this.isSigned()) {
+			return (int)Math.pow(2, (this.mostSignificant - this.leastSignificant) + 1 - 1) - 1;
+		} else {
+			return (int)Math.pow(2, this.mostSignificant - this.leastSignificant + 1);
+		}
+	}
+	
+	/**
+	 * Returns true if and only if this definition accepts signed Operand values.
+	 * @return a boolean indicating whether this definition accepts signed Operand values.
+	 */
+	public boolean isSigned() {
+		for (OperandType type : this.acceptableTypes) {
+			if (type == OperandType.LITERAL || type == OperandType.IMMEDIATE) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * For Instructions that map to multiple memory addresses, this index

@@ -43,13 +43,21 @@ public class Operand {
 	}
 
 	/**
-	 * Sets the definition of this Operand. No work is done at this point.
+	 * Sets the definition of this Operand. No work is done at this point,
+	 * except some basic error checking for immediate values.
 	 * 
 	 * @param definition
 	 *            OperandDefinition
 	 */
-	public void setDefinition(OperandDefinition definition) {
+	public void setDefinition(OperandDefinition definition) throws Exception {
 		this.definition = definition;
+		if (this.type == OperandType.IMMEDIATE) {
+			int result = Operand.parseConstant(this.value);
+			if (result > definition.getMaximumAllowedValue()
+				|| result < definition.getMinimumAllowedValue()) {
+				throw new Exception("Operand value \"" + Integer.toString(result) + "\" is out of bounds.");
+			}
+		}
 	}
 
 	/**
@@ -77,7 +85,7 @@ public class Operand {
 	 */
 	public void insert(int[] ops, SymbolTable symbols, LiteralTable literals)
 			throws Exception {
-		int x = Operand.getValue(this.value, symbols, literals);
+		int x = Operand.getValue(this.value, symbols, this.definition, literals);
 		ops[this.definition.getOperationIndex()] |= this.definition.getMask()
 				& (x << this.definition.getLeastSignificantBit());
 	}
@@ -136,13 +144,17 @@ public class Operand {
 				throw new Exception("Incorrect operand type for operand \"" + value + "\".");
 			}
 		}
+		int result = 0;
 		switch (type) {
 			case LITERAL:
-				return literals.getAddress(Operand.parseConstant(value));
+				result = literals.getAddress(Operand.parseConstant(value));
+				break;
 			case IMMEDIATE:
-				return Operand.parseConstant(value);
+				result = Operand.parseConstant(value);
+				break;
 			case REGISTER:
-				return Operand.parseConstant(value);
+				result = Operand.parseConstant(value);
+				break;
 			case SYMBOL:
 				if (symbols.hasSymbol(value)) {
 					Symbol symbol = symbols.get(value);
@@ -154,12 +166,18 @@ public class Operand {
 						throw new Exception("Relocatable symbol \"" +
 							value + "\" can not be used in a non-relocatable operand.");
 					}
-					return symbol.getValue();
+					result = symbol.getValue();
 				} else {
 					throw new Exception("Undefined symbol \"" + value + "\".");
 				}
+				break;
 		}
-		return 0;
+		if (definition != null) {
+			if (result > definition.getMaximumAllowedValue() || result < definition.getMinimumAllowedValue()) {
+				throw new Exception("Operand value \"" + value + "\" (" + Integer.toString(result) + ") is out of bounds.");
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -188,6 +206,7 @@ public class Operand {
 		} else {
 			throw new Exception("Failed to parse immediate operand \"" + value + "\".");
 		}
+		
 		return result;
 	}
 }

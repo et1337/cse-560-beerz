@@ -46,7 +46,7 @@ public class Instruction {
 	 * @param definition
 	 *            the InstructionDefinition to be set
 	 */
-	public void setDefinition(InstructionDefinition definition) {
+	public void setDefinition(InstructionDefinition definition) throws Exception {
 		this.definition = definition;
 		OperandDefinition[] definitions = this.definition
 				.getOperandDefinitions();
