@@ -35,12 +35,24 @@ public class Main {
 		try {
 			String data = Main.readAllText(filename);
 			Assembler assembler = new Assembler();
-			Program program = assembler.assemble(filename, data);
-			String result = program.getCode(generateListing);
-			Main.writeAllText(outFile, result);
+			Program program = null;
+			try {
+				program = assembler.assemble(filename, data);
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+			
+			if (program != null) {
+				String result = program.getCode(generateListing);
+				Main.writeAllText(outFile, result);
+			}
 		}
 		catch (IOException e) {
 			System.out.println("Failed to assemble program due to an IO error.");
+			return;
+		}
+		catch (Exception e) {
+			System.out.println("Failed to assemble program due to an unexpected error: " + e.getMessage());
 			return;
 		}
 	}

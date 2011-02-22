@@ -5,7 +5,8 @@ package Assembler;
  *  Register - corresponds to a register R0-R7.
  *  Literal - references a literal (e.g. =#100, =x5)
  *  Symbol - references a symbol in the symbol table
+ *  String - used for the .STRZ operation
  */
 public enum OperandType {
-	IMMEDIATE, REGISTER, LITERAL, SYMBOL
+	IMMEDIATE, REGISTER, LITERAL, SYMBOL, STRING
 }

@@ -118,8 +118,8 @@ public class Instruction {
 	 */
 	public int[] getCodes(SymbolTable symbols, LiteralTable literals)
 			throws Exception {
-		int[] result = this.definition.getOperations();
-		if (this.operands != null) {
+		int[] result = this.definition == null ? new int[] { } : this.definition.getOperations();
+		if (this.operands != null && result.length > 0) {
 			for (Operand operand : this.operands) {
 				operand.insert(result, symbols, literals);
 			}
