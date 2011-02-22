@@ -34,7 +34,7 @@ public class OperandDefinition {
 	private boolean relocatable;
 
 	/**
-	 * Any Operands that use this definition must have a type that is containe
+	 * Any Operands that use this definition must have a type that is contained
 	 * in this collection.
 	 */
 	private OperandType[] acceptableTypes;
