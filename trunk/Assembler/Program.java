@@ -1,10 +1,9 @@
 package Assembler;
 
 import java.util.List;
+import java.util.LinkedList;
 import java.util.Iterator;
 import java.util.Map;
-import java.io.PrintStream;
-import java.io.OutputStream;
 
 /**
  *  A Program contains an in-memory representation of an assembly Program, which can be rendered into binary form with the getCode function.
@@ -72,21 +71,9 @@ public class Program {
 	 * @param printListing a boolean to determine whether or not to print a program listing
 	 * @return a String representing the object file
 	 */
-	public String getCode(boolean printListing) {
+	public String getCode(boolean printListing) throws Exception {
 	
-		PrintStream out = null;
-		if (printListing) {
-			out = System.out;
-		}
-		else {
-			out = new PrintStream(new OutputStream() {
-				public void close() {}
-				public void flush() {}
-				public void write(byte[] b) {}
-				public void write(byte[] b, int off, int len) {}
-				public void write(int b) {}
-			});
-		}
+		StringBuffer output = new StringBuffer();
 		
 		StringBuffer result = new StringBuffer();
 		
@@ -100,6 +87,8 @@ public class Program {
 		
 		int address = this.origin;
 		
+		List<Error> errors = new LinkedList<Error>();
+		
 		// Output instructions.
 		for (Instruction instruction : this.instructions) {
 			try {
@@ -108,11 +97,11 @@ public class Program {
 					int[] relocationMasks = instruction.getDefinition().getRelocationMasks();
 					for (int i = 0; i < codes.length; i++) {
 						String code = ByteOperations.getHex(address + i, 4) + ByteOperations.getHex(codes[i], 4);
-						String output = code;
+						String line = code;
 						if (i == 0) {
-							output += "    " + instruction.getSource();
+							line += "    " + instruction.getSource();
 						}
-						out.println(output);
+						output.append(line + "\n");
 						result.append("T");
 						result.append(code);
 						if (this.isRelocatable) {
@@ -131,12 +120,12 @@ public class Program {
 					}
 				}
 				else {
-					out.println("            " + instruction.getSource());
+					output.append("            " + instruction.getSource() + "\n");
 				}
 				address += instruction.getDefinition().getSize();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				errors.add(new Error(e.getMessage()));
 			}
 		}
 		
@@ -148,10 +137,28 @@ public class Program {
 			result.append("T");
 			result.append(code);
 			result.append("\r\n");
-			out.println(code);
+			output.append(code + "\n");
 		}
 		
 		result.append("E" + ByteOperations.getHex(this.startAddress, 4));
+		
+		if (errors.size() > 0) {
+			// Output each error message that we have encountered
+			StringBuffer msg = new StringBuffer();
+			for(Error e : errors) {
+				msg.append("Assemble error: ");
+				if(e.hasLineNumber()) {
+					msg.append("Line ");
+					msg.append(Integer.toString(e.getLineNumber()));
+					msg.append(" - ");
+				}
+				msg.append(e.getMessage());
+				msg.append("\n");
+			}
+			throw new Exception(msg.toString());
+		} else if (printListing) {
+			System.out.println(output);
+		}
 		
 		// Return resulting code.
 		return result.toString();

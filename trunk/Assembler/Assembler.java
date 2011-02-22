@@ -48,7 +48,7 @@ public class Assembler {
 					errors.add(new Error(lineNumber, "Incorrect spacing."));
 				}
 				
-				String op = line.substring(9, 14).trim();
+				String op = line.substring(9, Math.min(line.length(), 14)).trim();
 				String[] operands = this.getOperands(line);
 
 				if (!label.equals("")) {
@@ -133,7 +133,7 @@ public class Assembler {
 								new OperandDefinition[] { new OperandDefinition(
 										fillRelocatable, new OperandType[] {
 											OperandType.IMMEDIATE,
-											OperandType.SYMBOL }, 0, 15, 0) }));
+											OperandType.SYMBOL }, 15, 0) }));
 						if (!instruction.getDefinition().isAcceptable(instruction)) {
 							errors.add(new Error(lineNumber, "Incorrect operands for .FILL operation."));
 						}
@@ -168,7 +168,7 @@ public class Assembler {
 						new OperandDefinition[] { new OperandDefinition(
 							true, new OperandType[] {
 								OperandType.IMMEDIATE,
-								OperandType.SYMBOL }, 0, 0) }));
+								OperandType.SYMBOL }, 15, 0) }));
 					startAddress = Operand.getValue(operands[0], symbols,
 						instruction.getDefinition().getOperandDefinitions()[0], literals);
 				} else if (op.equals(".BLKW")) {
@@ -183,8 +183,12 @@ public class Assembler {
 								false, new OperandType[] {
 									OperandType.IMMEDIATE,
 									OperandType.SYMBOL },
-								0, 0),
+								15, 0),
 							literals);
+						if (size < 0) { // Operand.getValue will allow negative numbers.
+							size = 0;
+							errors.add(new Error(lineNumber, ".BLKW requires a positive operand."));
+						}
 					}
 					instruction.setDefinition(new InstructionDefinition(
 							".BLKW", size, false));

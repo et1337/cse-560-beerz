@@ -52,7 +52,7 @@ public class Main {
 			return;
 		}
 		catch (Exception e) {
-			System.out.println("Failed to assemble program due to an unexpected error: " + e.getMessage());
+			System.out.println(e.getMessage());
 			return;
 		}
 	}
