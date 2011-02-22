@@ -1,4 +1,4 @@
-Test26   .ORIG
+Test37   .ORIG
 Sym00     .EQU    x3
 Sym01     .EQU    x3
 Sym02     .EQU    x3
