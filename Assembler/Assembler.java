@@ -12,205 +12,6 @@ import java.util.ArrayList;
 public class Assembler {
 
 	/**
-	 * Definitions of program instructions. Psuedo-ops are not defined in this
-	 * table.
-	 */
-	private InstructionDefinition[] instructionDefinitions;
-	
-	
-	/**
-	* List of errors encountered in assembly. 
-	*/
-	List<Error> errors = new LinkedList<Error>();
-	
-	/**
-	 * Instantiates a new Assembler. Initializes the instruction definition
-	 * table.
-	 */
-	public Assembler() {
-
-		// Initialize instruction definition table.
-
-		this.instructionDefinitions = new InstructionDefinition[] {
-				new InstructionDefinition("ADD", new int[] { 0x1000 },
-						new OperandDefinition[] {
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 11, 9),
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 8, 6),
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 2, 0) }),
-				new InstructionDefinition("ADD", new int[] { 0x1020 },
-						new OperandDefinition[] {
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 11, 9),
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 8, 6),
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 4, 0) }),
-				new InstructionDefinition("AND", new int[] { 0x5000 },
-						new OperandDefinition[] {
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 11, 9),
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 8, 6),
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 2, 0) }),
-				new InstructionDefinition("AND", new int[] { 0x5020 },
-						new OperandDefinition[] {
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 11, 9),
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 8, 6),
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 4, 0) }),
-				new InstructionDefinition("BRN", new int[] { 0x0800 },
-						new OperandDefinition[] { new OperandDefinition(true,
-								new OperandType[] { OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 8, 0) }),
-				new InstructionDefinition("BRZ", new int[] { 0x0400 },
-						new OperandDefinition[] { new OperandDefinition(true,
-								new OperandType[] { OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 8, 0) }),
-				new InstructionDefinition("BRP", new int[] { 0x0200 },
-						new OperandDefinition[] { new OperandDefinition(true,
-								new OperandType[] { OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 8, 0) }),
-				new InstructionDefinition("BRNZ", new int[] { 0x0C00 },
-						new OperandDefinition[] { new OperandDefinition(true,
-								new OperandType[] { OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 8, 0) }),
-				new InstructionDefinition("BRNP", new int[] { 0x0A00 },
-						new OperandDefinition[] { new OperandDefinition(true,
-								new OperandType[] { OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 8, 0) }),
-				new InstructionDefinition("BRZP", new int[] { 0x0600 },
-						new OperandDefinition[] { new OperandDefinition(true,
-								new OperandType[] { OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 8, 0) }),
-				new InstructionDefinition("BRNZP", new int[] { 0x0E00 },
-						new OperandDefinition[] { new OperandDefinition(true,
-								new OperandType[] { OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 8, 0) }),
-				new InstructionDefinition("DBUG", new int[] { 0x8000 },
-						new OperandDefinition[] {}),
-				new InstructionDefinition("JSR", new int[] { 0x4000 },
-						new OperandDefinition[] { new OperandDefinition(true,
-								new OperandType[] { OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 8, 0) }),
-				new InstructionDefinition("JMP", new int[] { 0x4800 },
-						new OperandDefinition[] { new OperandDefinition(true,
-								new OperandType[] { OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 8, 0) }),
-				new InstructionDefinition("JSRR", new int[] { 0xC000 },
-						new OperandDefinition[] {
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 8, 6),
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 5, 0) }),
-				new InstructionDefinition("JMPR", new int[] { 0xC800 },
-						new OperandDefinition[] {
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 8, 6),
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 5, 0) }),
-				new InstructionDefinition("LD", new int[] { 0x2000 },
-						new OperandDefinition[] {
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 11, 9),
-								new OperandDefinition(true,
-										new OperandType[] {
-												OperandType.IMMEDIATE,
-												OperandType.SYMBOL,
-												OperandType.LITERAL }, 8, 0) }),
-				new InstructionDefinition("LDI", new int[] { 0xA000 },
-						new OperandDefinition[] {
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 11, 9),
-								new OperandDefinition(true, new OperandType[] {
-										OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 8, 0) }),
-				new InstructionDefinition("LDR", new int[] { 0x6000 },
-						new OperandDefinition[] {
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 11, 9),
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 8, 6),
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 5, 0) }),
-				new InstructionDefinition("LEA", new int[] { 0xE000 },
-						new OperandDefinition[] {
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 11, 9),
-								new OperandDefinition(true, new OperandType[] {
-										OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 8, 0) }),
-				new InstructionDefinition("NOT", new int[] { 0x9000 },
-						new OperandDefinition[] {
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 11, 9),
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 8, 6) }),
-				new InstructionDefinition("RET", new int[] { 0xD000 },
-						new OperandDefinition[] {}),
-				new InstructionDefinition("ST", new int[] { 0x3000 },
-						new OperandDefinition[] {
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 11, 9),
-								new OperandDefinition(true, new OperandType[] {
-										OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 8, 0) }),
-				new InstructionDefinition("STI", new int[] { 0xB000 },
-						new OperandDefinition[] {
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 11, 9),
-								new OperandDefinition(true, new OperandType[] {
-										OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 8, 0) }),
-				new InstructionDefinition("STR", new int[] { 0x7000 },
-						new OperandDefinition[] {
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 11, 9),
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.REGISTER,
-										OperandType.SYMBOL }, 8, 6),
-								new OperandDefinition(false, new OperandType[] {
-										OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 6, 0) }),
-				new InstructionDefinition("TRAP", new int[] { 0xF000 },
-						new OperandDefinition[] { new OperandDefinition(false,
-								new OperandType[] { OperandType.IMMEDIATE,
-										OperandType.SYMBOL }, 7, 0) }) };
-	}
-
-	/**
 	 * Assembles the given code into a Program.
 	 * 
 	 * @param filename the file name of the source code
@@ -218,6 +19,8 @@ public class Assembler {
 	 * @return the assembled program
 	 */
 	public Program assemble(String filename, String data) throws Exception {
+		List<Error> errors = new LinkedList<Error>();
+	
 		String[] lines = data.split("\n");
 		SymbolTable symbols = new SymbolTable();
 		LiteralTable literals = new LiteralTable();
@@ -452,7 +255,7 @@ public class Assembler {
 	 */
 	protected InstructionDefinition getInstructionDefinition(
 			Instruction instruction) {
-		for (InstructionDefinition definition : this.instructionDefinitions) {
+		for (InstructionDefinition definition : InstructionDefinition.getTable()) {
 			if (definition.isAcceptable(instruction)) {
 				return definition;
 			}

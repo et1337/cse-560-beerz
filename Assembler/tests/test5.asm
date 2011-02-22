@@ -1,5 +1,5 @@
 ; Tests relocation
-RlTest   .ORIG
+Test5    .ORIG
 count    .FILL   #4
 Begin    LD      ACC,count       ;R1 <- 4
          LEA     R0,msg

@@ -1,5 +1,5 @@
 ; Starts the loading the program at the end of memory; this should not assemble.
-Lab2EG   .ORIG   xFFFF
+Test4    .ORIG   xFFFF
 count    .FILL   #4
 Begin    LD      ACC,count       ;R1 <- 4
          LEA     R0,msg
