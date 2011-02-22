@@ -29,6 +29,9 @@ public class SymbolTable {
 			throw new Exception("Cannot alias a symbol to itself.");
 		}
 		Symbol symbol = this.get(target);
+		if (symbol == null) {
+			throw new Exception("Undefined symbol \"" + target + "\".");
+		}
 		this.define(new Symbol(alias, symbol.getValue(), symbol.isRelocatable()));
 	}
 	
@@ -48,5 +51,13 @@ public class SymbolTable {
 	 */
 	public Symbol get(String name) {
 		return this.map.get(name);
+	}
+	
+	/**
+	 * Gets the number of defined symbols in this table.
+	 * @return the number of defined symbols in this table.
+	 */
+	public int size() {
+		return this.map.size();
 	}
 }

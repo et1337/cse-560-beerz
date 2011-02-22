@@ -1,5 +1,5 @@
 ; Assembler should give an error; the program spans multiple memory pages
-Test6    .ORIG   x0E00
+Test6    .ORIG   x0FF0
 count    .FILL   #4
 Begin    LD      ACC,count       ;R1 <- 4
          LEA     R0,msg

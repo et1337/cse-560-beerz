@@ -8,6 +8,16 @@ import java.util.Set;
  *  Represents a table of literals accumulated during the first assembler pass.
  */
 public class LiteralTable {
+
+	/**
+	 * The minimum value a literal is allowed to have.
+	 */
+	protected static final int MIN_VALUE = -32768;
+	
+	/**
+	 * The maximum value a literal is allowed to have.
+	 */
+	protected static final int MAX_VALUE = 32767;
 	
 	/**
 	 *  The address (relative to this.offset) of the next literal to be inserted.
@@ -44,7 +54,10 @@ public class LiteralTable {
 	 *  Defines a new literal with the given integer value.
 	 * @param value the Integer value of the literal
 	 */
-	public void define(int value) {
+	public void define(int value) throws Exception {
+		if (value < LiteralTable.MIN_VALUE || value > LiteralTable.MAX_VALUE) {
+			throw new Exception("Literal value \"" + Integer.toString(value) + "\" is out of bounds.");
+		}
 		if (!this.map.containsKey(value)) {
 			this.map.put(value, this.index);
 			this.index++;
