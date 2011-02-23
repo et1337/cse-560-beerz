@@ -49,106 +49,6 @@ Sym46     .EQU    x3
 Sym47     .EQU    x3
 Sym48     .EQU    x3
 Sym49     .EQU    x3
-Sym50     .EQU    x3
-Sym51     .EQU    x3
-Sym52     .EQU    x3
-Sym53     .EQU    x3
-Sym54     .EQU    x3
-Sym55     .EQU    x3
-Sym56     .EQU    x3
-Sym57     .EQU    x3
-Sym58     .EQU    x3
-Sym59     .EQU    x3
-Sym60     .EQU    x3
-Sym61     .EQU    x3
-Sym62     .EQU    x3
-Sym63     .EQU    x3
-Sym64     .EQU    x3
-Sym65     .EQU    x3
-Sym66     .EQU    x3
-Sym67     .EQU    x3
-Sym68     .EQU    x3
-Sym69     .EQU    x3
-Sym70     .EQU    x3
-Sym71     .EQU    x3
-Sym72     .EQU    x3
-Sym73     .EQU    x3
-Sym74     .EQU    x3
-Sym75     .EQU    x3
-Sym76     .EQU    x3
-Sym77     .EQU    x3
-Sym78     .EQU    x3
-Sym79     .EQU    x3
-Sym80     .EQU    x3
-Sym81     .EQU    x3
-Sym82     .EQU    x3
-Sym83     .EQU    x3
-Sym84     .EQU    x3
-Sym85     .EQU    x3
-Sym86     .EQU    x3
-Sym87     .EQU    x3
-Sym88     .EQU    x3
-Sym89     .EQU    x3
-Sym90     .EQU    x3
-Sym91     .EQU    x3
-Sym92     .EQU    x3
-Sym93     .EQU    x3
-Sym94     .EQU    x3
-Sym95     .EQU    x3
-Sym96     .EQU    x3
-Sym97     .EQU    x3
-Sym98     .EQU    x3
-Sym99     .EQU    x3
-Lit00     .EQU    #3
-Lit01     .EQU    #3
-Lit02     .EQU    #3
-Lit03     .EQU    #3
-Lit04     .EQU    #3
-Lit05     .EQU    #3
-Lit06     .EQU    #3
-Lit07     .EQU    #3
-Lit08     .EQU    #3
-Lit09     .EQU    #3
-Lit10     .EQU    #3
-Lit11     .EQU    #3
-Lit12     .EQU    #3
-Lit13     .EQU    #3
-Lit14     .EQU    #3
-Lit15     .EQU    #3
-Lit16     .EQU    #3
-Lit17     .EQU    #3
-Lit18     .EQU    #3
-Lit19     .EQU    #3
-Lit20     .EQU    #3
-Lit21     .EQU    #3
-Lit22     .EQU    #3
-Lit23     .EQU    #3
-Lit24     .EQU    #3
-Lit25     .EQU    #3
-Lit26     .EQU    #3
-Lit27     .EQU    #3
-Lit28     .EQU    #3
-Lit29     .EQU    #3
-Lit30     .EQU    #3
-Lit31     .EQU    #3
-Lit32     .EQU    #3
-Lit33     .EQU    #3
-Lit34     .EQU    #3
-Lit35     .EQU    #3
-Lit36     .EQU    #3
-Lit37     .EQU    #3
-Lit38     .EQU    #3
-Lit39     .EQU    #3
-Lit40     .EQU    #3
-Lit41     .EQU    #3
-Lit42     .EQU    #3
-Lit43     .EQU    #3
-Lit44     .EQU    #3
-Lit45     .EQU    #3
-Lit46     .EQU    #3
-Lit47     .EQU    #3
-Lit48     .EQU    #3
-Lit49     .EQU    #3
 Begin    ADD     R1, R1, Sym00
          ADD     R1, R1, Sym01
          ADD     R1, R1, Sym02
@@ -180,21 +80,123 @@ Begin    ADD     R1, R1, Sym00
          ADD     R1, R1, Sym28
          ADD     R1, R1, Sym29
          ADD     R1, R1, Sym30
-         ADD     R1, R1, Lit00
-         ADD     R1, R1, Lit01
-         ADD     R1, R1, Lit02
-         ADD     R1, R1, Lit03
-         ADD     R1, R1, Lit04
-         ADD     R1, R1, Lit05
-         ADD     R1, R1, Lit06
-         ADD     R1, R1, Lit07
-         ADD     R1, R1, Lit08
-         ADD     R1, R1, Lit09
-         ADD     R1, R1, Lit10
-         ADD     R1, R1, Lit11
-         ADD     R1, R1, Lit12
-         ADD     R1, R1, Lit13
-         ADD     R1, R1, Lit14
-         ADD     R1, R1, Lit15
-         ADD     R1, R1, Lit16
+         ADD     R1, R1, Sym31
+         ADD     R1, R1, Sym32
+         ADD     R1, R1, Sym33
+         ADD     R1, R1, Sym34
+         ADD     R1, R1, Sym35
+         ADD     R1, R1, Sym36
+         ADD     R1, R1, Sym37
+         ADD     R1, R1, Sym38
+         ADD     R1, R1, Sym39
+         ADD     R1, R1, Sym40
+         ADD     R1, R1, Sym41
+         ADD     R1, R1, Sym42
+         ADD     R1, R1, Sym43
+         ADD     R1, R1, Sym44
+         ADD     R1, R1, Sym45
+         ADD     R1, R1, Sym46
+         ADD     R1, R1, Sym47
+         ADD     R1, R1, Sym48
+         ADD     R1, R1, Sym49
+         LD      R0, =#100
+         ADD     R1, R0, Sym00
+         LD      R0, =#101
+         ADD     R1, R0, Sym00
+         LD      R0, =#102
+         ADD     R1, R0, Sym00
+         LD      R0, =#103
+         ADD     R1, R0, Sym00 
+         LD      R0, =#104
+         ADD     R1, R0, Sym00		 
+         LD      R0, =#105
+         ADD     R1, R0, Sym00
+         LD      R0, =#106
+         ADD     R1, R0, Sym00
+         LD      R0, =#107
+         ADD     R1, R0, Sym00
+         LD      R0, =#108
+         ADD     R1, R0, Sym00
+         LD      R0, =#109
+         ADD     R1, R0, Sym00
+         LD      R0, =#110
+         ADD     R1, R0, Sym00
+         LD      R0, =#111
+         ADD     R1, R0, Sym00
+         LD      R0, =#112
+         ADD     R1, R0, Sym00
+         LD      R0, =#113
+         ADD     R1, R0, Sym00
+         LD      R0, =#114
+         ADD     R1, R0, Sym00
+         LD      R0, =#115
+         ADD     R1, R0, Sym00
+         LD      R0, =#116
+         ADD     R1, R0, Sym00
+         LD      R0, =#117
+         ADD     R1, R0, Sym00
+         LD      R0, =#118
+         ADD     R1, R0, Sym00
+         LD      R0, =#119
+         ADD     R1, R0, Sym00
+         LD      R0, =#120
+         ADD     R1, R0, Sym00
+         LD      R0, =#121
+         ADD     R1, R0, Sym00
+         LD      R0, =#122
+         ADD     R1, R0, Sym00
+         LD      R0, =#123
+         ADD     R1, R0, Sym00
+         LD      R0, =#124
+         ADD     R1, R0, Sym00
+         LD      R0, =#125
+         ADD     R1, R0, Sym00
+         LD      R0, =#126
+         ADD     R1, R0, Sym00
+         LD      R0, =#127
+         ADD     R1, R0, Sym00
+         LD      R0, =#128
+         ADD     R1, R0, Sym00
+         LD      R0, =#129
+         ADD     R1, R0, Sym00
+         LD      R0, =#130
+         ADD     R1, R0, Sym00
+         LD      R0, =#131
+         ADD     R1, R0, Sym00
+         LD      R0, =#132
+         ADD     R1, R0, Sym00
+         LD      R0, =#133
+         ADD     R1, R0, Sym00
+         LD      R0, =#134
+         ADD     R1, R0, Sym00
+         LD      R0, =#135
+         ADD     R1, R0, Sym00
+         LD      R0, =#136
+         ADD     R1, R0, Sym00
+         LD      R0, =#137
+         ADD     R1, R0, Sym00
+         LD      R0, =#138
+         ADD     R1, R0, Sym00
+         LD      R0, =#139
+         ADD     R1, R0, Sym00
+         LD      R0, =#140
+         ADD     R1, R0, Sym00
+         LD      R0, =#141
+         ADD     R1, R0, Sym00
+         LD      R0, =#142
+         ADD     R1, R0, Sym00
+         LD      R0, =#143
+         ADD     R1, R0, Sym00
+         LD      R0, =#144
+         ADD     R1, R0, Sym00
+         LD      R0, =#145
+         ADD     R1, R0, Sym00
+         LD      R0, =#146
+         ADD     R1, R0, Sym00
+         LD      R0, =#147
+         ADD     R1, R0, Sym00
+         LD      R0, =#148
+         ADD     R1, R0, Sym00
+         LD      R0, =#149
+         ADD     R1, R0, Sym00		 
          .END    x0
