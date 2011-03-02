@@ -20,5 +20,5 @@ Next     AND     R0,R0,x0   ;R0 <- 0
 ACC      .EQU    #1
 ; ----- Scratch Space -----
 Array    .BLKW   #3
-         .FILL   x10
-         .END    Begin
+         .FILL   x10 ; No .END operand
+         .END

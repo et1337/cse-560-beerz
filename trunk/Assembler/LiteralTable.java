@@ -10,14 +10,19 @@ import java.util.Set;
 public class LiteralTable {
 
 	/**
-	 * The minimum value a literal is allowed to have.
+	 * The minimum value a decimal literal is allowed to have.
 	 */
-	protected static final int MIN_VALUE = -32768;
+	protected static final int MIN_VALUE_DECIMAL = -32768;
 	
 	/**
-	 * The maximum value a literal is allowed to have.
+	 * The maximum value a decimal literal is allowed to have.
 	 */
-	protected static final int MAX_VALUE = 32767;
+	protected static final int MAX_VALUE_DECIMAL = 32767;
+	
+	/**
+	 * The maximum value a hex literal is allowed to have.
+	 */
+	protected static final int MAX_VALUE_HEX = 0xFFFF;
 	
 	/**
 	 *  The address (relative to this.offset) of the next literal to be inserted.
@@ -53,10 +58,19 @@ public class LiteralTable {
 	/**
 	 *  Defines a new literal with the given integer value.
 	 * @param value the Integer value of the literal
+	 * @param isHex true if the value is hexadecimal
 	 */
-	public void define(int value) throws Exception {
-		if (value < LiteralTable.MIN_VALUE || value > LiteralTable.MAX_VALUE) {
-			throw new Exception("Literal value \"" + Integer.toString(value) + "\" is out of bounds.");
+	public void define(int value, boolean isHex) throws Exception {
+		if (isHex) {
+			if (value < 0 || value > LiteralTable.MAX_VALUE_HEX) {
+				throw new Exception("Literal value \"" + Integer.toString(value) + "\" must be between 0 and "
+					+ Integer.toString(LiteralTable.MAX_VALUE_HEX) + ".");
+			}
+		}
+		else if (value < LiteralTable.MIN_VALUE_DECIMAL || value > LiteralTable.MAX_VALUE_DECIMAL) {
+			throw new Exception("Literal value \"" + Integer.toString(value) + "\" must be between "
+				+ Integer.toString(LiteralTable.MIN_VALUE_DECIMAL) + " and "
+				+ Integer.toString(LiteralTable.MAX_VALUE_DECIMAL) + ".");
 		}
 		if (!this.map.containsKey(value)) {
 			this.map.put(value, this.index);

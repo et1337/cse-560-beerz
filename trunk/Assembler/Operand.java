@@ -38,7 +38,7 @@ public class Operand {
 		this.value = value;
 		this.type = Operand.determineType(this.value);
 		if (this.type == OperandType.LITERAL) {
-			literals.define(Operand.parseConstant(this.value));
+			literals.define(Operand.parseConstant(this.value), this.value.charAt(0) == 'x');
 		}
 	}
 
@@ -69,6 +69,15 @@ public class Operand {
 	public OperandType getType() {
 		return this.type;
 	}
+	
+	/**
+	 * Returns the Definition of this Operand.
+	 * 
+	 * @return the Definition of this Operand.
+	 */
+	public OperandDefinition getDefinition() {
+		return this.definition;
+	}
 
 	/**
 	 * Inserts the binary value of this Operand into the given instruction
@@ -88,6 +97,20 @@ public class Operand {
 		int x = Operand.getValue(this.value, symbols, this.definition, literals);
 		ops[this.definition.getOperationIndex()] |= this.definition.getMask()
 				& (x << this.definition.getLeastSignificantBit());
+	}
+	
+	/**
+	 * True if this Operand is relocatable, false if not.
+	 * 
+	 * @return true if and only if the Operand is relocatable
+	 */
+	public boolean isRelocatable(SymbolTable symbols) {
+		if (this.type == OperandType.SYMBOL) {
+			return symbols.hasSymbol(value) && symbols.get(value).isRelocatable();
+		}
+		else {
+			return this.getDefinition().isRelocatable();
+		}
 	}
 
 	/**
@@ -222,7 +245,7 @@ public class Operand {
 		if (firstCharacter == '#') {
 			result = Integer.valueOf(v, 10);
 		} else if (firstCharacter == 'x') {
-			result = ByteOperations.extendSign(ByteOperations.parseHex(v), 15);
+			result = ByteOperations.parseHex(v);
 		} else if (firstCharacter == 'R') {
 			result = Integer.valueOf(v, 10);
 		} else {
