@@ -62,6 +62,19 @@ public class Assembler {
 				// Extract the label
 				String label = line.length() >= 8 ? line.substring(0, 7).trim() : "";
 				
+				if (!label.equals("")) {
+					char c = label.charAt(0);
+					if (c == 'x'
+						|| c == 'R'
+						|| c == '#'
+						|| c == '=') {
+						errors.add(new Error(lineNumber, "Label name must not start with 'x', 'R', '#', or '='."));
+					}
+					if (label.contains(" ") || label.contains(",")) {
+						errors.add(new Error(lineNumber, "Label name must not contain spaces or commas."));
+					}
+				}
+				
 				// Check for spacing errors.
 				String space1 = line.length() >= 9 ? line.substring(7, 9).trim() : "";
 				String space2 = line.length() >= 17 ? line.substring(14, 17).trim() : "";
@@ -148,25 +161,14 @@ public class Assembler {
 					if (operands.length != 1) {
 						// Error
 						errors.add(new Error(lineNumber, ".FILL requires one operand. " 
-						+ Integer.toString(operands.length) + " were given."));
+							+ Integer.toString(operands.length) + " were given."));
 					}
 					else {
-						OperandType type = Operand.determineType(operands[0]);
-						boolean fillRelocatable = false;
-						if (type == OperandType.SYMBOL) {
-							if (!symbols.hasSymbol(operands[0])) {
-								// Error
-								errors.add(new Error(lineNumber, "Symbol referenced in operand not defined."));
-							} else {
-								Symbol symbol = symbols.get(operands[0]);
-								fillRelocatable = symbol.isRelocatable();
-							}
-						}
 						instruction.setOperands(operands, literals);
 						instruction.setDefinition(new InstructionDefinition(
 								".FILL", new int[] { 0x000 },
 								new OperandDefinition[] { new OperandDefinition(
-										fillRelocatable, new OperandType[] {
+										true, new OperandType[] {
 											OperandType.IMMEDIATE,
 											OperandType.SYMBOL }, 15, 0) }));
 						if (!instruction.getDefinition().isAcceptable(instruction)) {
@@ -202,20 +204,33 @@ public class Assembler {
 								".STRZ", stringLiteral.length() + 1, true));
 					}
 				} else if (op.equals(".END")) {
+					if (!label.equals("")) {
+						errors.add(new Error(lineNumber, "No label allowed on .END instruction."));
+					}
 					if (hasEnd) {
 						// Can't have multiple .END instructions
 						errors.add(new Error(lineNumber, "Multiple .END instructions are not allowed."));
 					}
 					hasEnd = true;
 					instruction.setOperands(operands, literals);
-					instruction.setDefinition(new InstructionDefinition(
-						".END", new int[] { },
-						new OperandDefinition[] { new OperandDefinition(
+					OperandDefinition[] ops = null;
+					// Optional operand
+					if (operands.length > 0) {
+						ops = new OperandDefinition[] { new OperandDefinition(
 							true, new OperandType[] {
 								OperandType.IMMEDIATE,
-								OperandType.SYMBOL }, 15, 0) }));
-					startAddress = Operand.getValue(operands[0], symbols,
-						instruction.getDefinition().getOperandDefinitions()[0], literals);
+								OperandType.SYMBOL }, 15, 0) };
+					} else {
+						ops = new OperandDefinition[] { };
+					}
+					instruction.setDefinition(new InstructionDefinition(
+						".END", new int[] { }, ops));
+					if (operands.length > 0) {
+						startAddress = Operand.getValue(operands[0], symbols,
+							instruction.getDefinition().getOperandDefinitions()[0], literals);
+					} else {
+						startAddress = origin; // Default start address = origin.
+					}
 				} else if (op.equals(".BLKW")) {
 					int size = 0;
 					if (operands.length != 1) {
@@ -269,7 +284,7 @@ public class Assembler {
 		literals.setOffset(location);
 		
 		int lastAddress = literals.getOffset() + literals.getEntries().size();
-		if ((origin & 0xFFFFF800) != (lastAddress & 0xFFFFF800)) {
+		if (relocatable && (lastAddress & 0xFE00) > 0) {
 			errors.add(new Error("Program spans multiple memory pages. Relocate or shrink the program to fit inside one memory page."));
 		}
 		

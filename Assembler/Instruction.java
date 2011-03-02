@@ -104,6 +104,21 @@ public class Instruction {
 	public Operand[] getOperands() {
 		return this.operands;
 	}
+	
+	/** 
+	 * @return masks An array of bitmasks which specify which parts of the instruction
+	 * are relocatable.
+	 */
+	public int[] getRelocationMasks(SymbolTable symbols) {
+		int[] masks = new int[this.definition.getOperations().length];
+		for (int i = 0; i < this.operands.length; i++) {
+			Operand operand = this.operands[i];
+			if (operand.isRelocatable(symbols)) {
+				masks[operand.getDefinition().getOperationIndex()] |= operand.getDefinition().getMask();
+			}
+		}
+		return masks;
+	}
 
 	/**
 	 * Gets the final executable binary codes called for by this Instruction.

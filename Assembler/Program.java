@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Comparator;
+import java.util.Collections;
 
 /**
  *  A Program contains an in-memory representation of an assembly Program, which can be rendered into binary form with the getCode function.
@@ -72,16 +74,20 @@ public class Program {
 	 * @return a String representing the object file
 	 */
 	public String getCode(boolean printListing) throws Exception {
-	
+		
 		StringBuffer output = new StringBuffer();
 		
 		StringBuffer result = new StringBuffer();
 		
-		String header = "H"
-			+ this.name
-			+ ByteOperations.getHex(this.origin, 4)
-			+ ByteOperations.getHex(this.literals.getOffset() - this.origin
-			+ this.literals.getEntries().size(), 4);
+		String header = "H" + this.name;
+		
+		if (this.isRelocatable) {
+			header += "MMMM";
+		} else {
+			header += ByteOperations.getHex(this.origin, 4);
+		}
+		header += ByteOperations.getHex(this.literals.getOffset() - this.origin + this.literals.getEntries().size(), 4);
+		
 		result.append(header);
 		result.append("\r\n");
 		
@@ -94,7 +100,7 @@ public class Program {
 			try {
 				int[] codes = instruction.getCodes(this.symbols, this.literals);
 				if (codes.length > 0) {
-					int[] relocationMasks = instruction.getDefinition().getRelocationMasks();
+					int[] relocationMasks = instruction.getRelocationMasks(this.symbols);
 					for (int i = 0; i < codes.length; i++) {
 						String code = ByteOperations.getHex(address + i, 4) + ByteOperations.getHex(codes[i], 4);
 						String line = code;
@@ -130,7 +136,14 @@ public class Program {
 		}
 		
 		// Output literal table. 
-		Iterator<Map.Entry<Integer, Integer>> entryIterator = this.literals.getEntries().iterator();
+		List list = new LinkedList(this.literals.getEntries());
+		Collections.sort(list, new Comparator() {
+			public int compare(Object o1, Object o2) {
+				return ((Comparable) ((Map.Entry) (o1)).getValue())
+				.compareTo(((Map.Entry) (o2)).getValue());
+			}
+		});
+		Iterator<Map.Entry<Integer, Integer>> entryIterator = list.iterator();
 		while (entryIterator.hasNext()) {
 			Map.Entry<Integer, Integer> entry = entryIterator.next();
 			String code = ByteOperations.getHex(entry.getValue() + this.literals.getOffset(), 4) + ByteOperations.getHex(entry.getKey(), 4);

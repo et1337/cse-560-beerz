@@ -29,7 +29,7 @@ public class OperandDefinition {
 	private int opIndex;
 
 	/**
-	 * True if this definition's Operands are relocatable, false if not.
+	 * True if this definition's Operands can be relocatable, false if not.
 	 */
 	private boolean relocatable;
 
@@ -145,11 +145,7 @@ public class OperandDefinition {
 	 * @return an integer representing the minimum allowed Operand value.
 	 */
 	public int getMinimumAllowedValue() {
-		if (this.isSigned()) {
-			return -1 * (int)Math.pow(2, (this.mostSignificant - this.leastSignificant) + 1 - 1);
-		} else {
-			return 0;
-		}
+		return -1 * (int)Math.pow(2, (this.mostSignificant - this.leastSignificant) + 1 - 1);
 	}
 	
 	/**
@@ -157,11 +153,7 @@ public class OperandDefinition {
 	 * @return an integer representing the maximum allowed Operand value.
 	 */
 	public int getMaximumAllowedValue() {
-		if (this.isSigned()) {
-			return (int)Math.pow(2, (this.mostSignificant - this.leastSignificant) + 1 - 1) - 1;
-		} else {
-			return (int)Math.pow(2, this.mostSignificant - this.leastSignificant + 1);
-		}
+		return (int)Math.pow(2, this.mostSignificant - this.leastSignificant + 1);
 	}
 	
 	/**
@@ -191,9 +183,9 @@ public class OperandDefinition {
 	}
 
 	/**
-	 * True if this definition's Operands are relocatable, false if not.
+	 * True if this definition's Operands can be relocatable, false if not.
 	 * 
-	 * @return returns true if an only if the Operand is relocatable
+	 * @return true if and only if the Operand can be relocatable
 	 */
 	public boolean isRelocatable() {
 		return this.relocatable;
