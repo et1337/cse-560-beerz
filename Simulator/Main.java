@@ -1,11 +1,12 @@
+package Simulator;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.PrintStream;
-import state.MemoryBank;
-import program.Loader;
-import program.Machine;
-import program.ExecutionMode;
+import Simulator.state.MemoryBank;
+import Simulator.program.Loader;
+import Simulator.program.Machine;
+import Simulator.program.ExecutionMode;
 
 public class Main {
 	/**

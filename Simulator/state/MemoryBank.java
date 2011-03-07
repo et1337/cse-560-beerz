@@ -1,8 +1,8 @@
-package state;
+package Simulator.state;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.HashMap;
-import util.ByteOperations;
+import Simulator.util.ByteOperations;
 
 /**
  * A MemoryBank represents the state of memory in a Machine.

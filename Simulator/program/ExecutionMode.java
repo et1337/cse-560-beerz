@@ -1,4 +1,4 @@
-package program;
+package Simulator.program;
 /**
  * This enumeration defines all the possible execution modes for a Machine.
  * 

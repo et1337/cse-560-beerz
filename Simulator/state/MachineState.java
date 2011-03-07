@@ -1,6 +1,6 @@
-package state;
+package Simulator.state;
 import java.io.PrintStream;
-import instructions.DebugHandler;
+import Simulator.instructions.DebugHandler;
 
 /**
  * This class represents the state of a virtual machine, not including the memory, which is represented by a MemoryBank.
