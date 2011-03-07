@@ -1,13 +1,13 @@
-package testing;
+package Simulator.testing;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import state.MemoryBank;
-import state.MachineState;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import program.Machine;
-import program.ExecutionMode;
+import Simulator.state.MemoryBank;
+import Simulator.state.MachineState;
+import Simulator.program.Machine;
+import Simulator.program.ExecutionMode;
 
 public class MachineTest extends TestBase {
 	/**

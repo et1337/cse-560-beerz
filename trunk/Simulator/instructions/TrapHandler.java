@@ -1,14 +1,14 @@
-package instructions;
+package Simulator.instructions;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
-import state.MachineState;
-import state.MemoryBank;
-import util.ByteOperations;
 import java.io.PrintStream;
 import java.io.InputStream;
 import java.util.Random;
+import Simulator.state.MachineState;
+import Simulator.state.MemoryBank;
+import Simulator.util.ByteOperations;
 
 /**
  * Handles the Trap instruction.

@@ -1,6 +1,6 @@
-package instructions;
-import state.MachineState;
-import state.MemoryBank;
+package Simulator.instructions;
+import Simulator.state.MachineState;
+import Simulator.state.MemoryBank;
 import java.io.PrintStream;
 import java.io.InputStream;
 import java.io.OutputStream;

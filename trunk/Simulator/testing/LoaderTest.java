@@ -1,9 +1,9 @@
-package testing;
+package Simulator.testing;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import state.MemoryBank;
-import program.Loader;
+import Simulator.state.MemoryBank;
+import Simulator.program.Loader;
 
 /**
  * Tests the Loader component of the machine.

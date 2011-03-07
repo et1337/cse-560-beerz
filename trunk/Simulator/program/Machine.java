@@ -1,9 +1,9 @@
-package program;
+package Simulator.program;
 import java.io.PrintStream;
-import instructions.InstructionMappings;
-import state.MachineState;
-import state.MemoryBank;
-import util.ByteOperations;
+import Simulator.instructions.InstructionMappings;
+import Simulator.state.MachineState;
+import Simulator.state.MemoryBank;
+import Simulator.util.ByteOperations;
 
 /**
  * This class represents a virtual machine capable of executing instructions stored in a MemoryBank.

@@ -1,11 +1,11 @@
-package instructions;
+package Simulator.instructions;
 import java.util.Map;
 import java.util.HashMap;
-import state.MachineState;
-import state.MemoryBank;
-import util.ByteOperations;
 import java.io.PrintStream;
 import java.io.InputStream;
+import Simulator.state.MachineState;
+import Simulator.state.MemoryBank;
+import Simulator.util.ByteOperations;
 
 /**
  * Static class for mapping op codes to instructions.

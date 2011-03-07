@@ -1,10 +1,10 @@
-package testing;
+package Simulator.testing;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
-import state.MemoryBank;
-import state.MachineState;
-import instructions.JumpSubroutineImmediateHandler;
+import Simulator.state.MemoryBank;
+import Simulator.state.MachineState;
+import Simulator.instructions.JumpSubroutineImmediateHandler;
 /**
  * Tests the functionality of the Jump Subroutine Immediate test.
  * 

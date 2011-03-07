@@ -1,8 +1,8 @@
-package program;
+package Simulator.program;
 import java.util.List;
 import java.util.LinkedList;
-import util.ByteOperations;
-import state.MemoryBank;
+import Simulator.util.ByteOperations;
+import Simulator.state.MemoryBank;
 
 /**
  * Given the data from a file, this class loads the data into a MemoryBank, validating for errors as it goes.
