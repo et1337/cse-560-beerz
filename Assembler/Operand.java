@@ -1,5 +1,9 @@
 package Assembler;
 
+import Common.ByteOperations;
+import Common.Symbol;
+import Common.SymbolTable;
+
 /**
  * An Operand represents a value (a Symbol, register identifier, literal, or
  * immediate value) to be inserted into an instruction.
@@ -94,9 +98,17 @@ public class Operand {
 	 */
 	public void insert(int[] ops, SymbolTable symbols, LiteralTable literals)
 			throws Exception {
-		int x = Operand.getValue(this.value, symbols, this.definition, literals);
+		int x = Operand.getValue(this.value, symbols, this.definition, this.type, literals);
 		ops[this.definition.getOperationIndex()] |= this.definition.getMask()
 				& (x << this.definition.getLeastSignificantBit());
+	}
+	
+	public Symbol getSymbol(SymbolTable symbols) {
+		if (this.type == OperandType.SYMBOL) {
+			return symbols.get(this.value);
+		} else {
+			return null;
+		}
 	}
 	
 	/**
@@ -155,7 +167,7 @@ public class Operand {
 	 */
 	public static int getValue(String value, SymbolTable symbols,
 			LiteralTable literals) throws Exception {
-		return Operand.getValue(value, symbols, null, literals);
+		return Operand.getValue(value, symbols, null, Operand.determineType(value), literals);
 	}
 
 	/**
@@ -169,15 +181,16 @@ public class Operand {
 	 *            the SymbolTable used by the Operand
 	 * @param definition
 	 *            optional definition of the Operand
+	 * @param type
+	 * 	          OperandType of the Operand
 	 * @param literals
 	 *            the Literaltable used by the Operand
 	 * @return the value of the Operand
 	 * @throws Exception
 	 */
 	public static int getValue(String value, SymbolTable symbols,
-			OperandDefinition definition, LiteralTable literals)
+			OperandDefinition definition, OperandType type, LiteralTable literals)
 			throws Exception {
-		OperandType type = Operand.determineType(value);
 		if (definition != null) {
 			if (!definition.isAcceptable(type)) {
 				throw new Exception("Incorrect operand type for operand \"" + value + "\".");

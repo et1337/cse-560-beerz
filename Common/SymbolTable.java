@@ -1,7 +1,8 @@
-package Assembler;
+package Common;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Collection;
 
 public class SymbolTable {
 
@@ -59,5 +60,13 @@ public class SymbolTable {
 	 */
 	public int size() {
 		return this.map.size();
+	}
+	
+	/**
+	 *  Gets the set of all address/value pairs in this table.
+	 * @return the set of all address/value pairs
+	 */
+	public Collection<Symbol> getSymbols() {
+		return this.map.values();
 	}
 }

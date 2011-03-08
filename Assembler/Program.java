@@ -6,6 +6,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Comparator;
 import java.util.Collections;
+import Common.ByteOperations;
+import Common.Error;
+import Common.Symbol;
+import Common.SymbolTable;
 
 /**
  *  A Program contains an in-memory representation of an assembly Program, which can be rendered into binary form with the getCode function.
@@ -95,6 +99,37 @@ public class Program {
 		
 		List<Error> errors = new LinkedList<Error>();
 		
+		for (Symbol symbol : this.symbols.getSymbols()) {
+			if (symbol.isExport()) {
+				result.append("E");
+				if (symbol.isRelocatable()) {
+					result.append("R");
+				} else {
+					result.append("A");
+				}
+				result.append(ByteOperations.getHex(symbol.getValue(), 4));
+				result.append(symbol.getName());
+				result.append("\r\n");
+			}
+		}
+		
+		for (Instruction instruction : this.instructions) {
+			for (Operand operand : instruction.getOperands()) {
+				Symbol symbol = operand.getSymbol(this.symbols);
+				if (symbol != null && symbol.isImport()) {
+					OperandDefinition definition = operand.getDefinition();
+					if (definition != null) {
+						result.append("I");
+						result.append(ByteOperations.getHex(address + definition.getOperationIndex(), 4));
+						result.append(ByteOperations.getHex(definition.getMostSignificantBit(), 1));
+						result.append(ByteOperations.getHex(definition.getLeastSignificantBit(), 1));
+						result.append(symbol.getName());
+						result.append("\r\n");
+					}
+				}
+			}
+		}
+		
 		// Output instructions.
 		for (Instruction instruction : this.instructions) {
 			try {
@@ -131,7 +166,11 @@ public class Program {
 				address += instruction.getDefinition().getSize();
 			}
 			catch (Exception e) {
-				errors.add(new Error(e.getMessage()));
+				if (e.getMessage() != null) {
+					errors.add(new Error(e.getMessage()));
+				} else {
+					e.printStackTrace();
+				}
 			}
 		}
 		

@@ -1,12 +1,11 @@
-package Simulator;
+package Loader;
 import java.io.IOException;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.PrintStream;
 import Common.MemoryBank;
-import Simulator.program.Loader;
-import Simulator.program.Machine;
-import Simulator.program.ExecutionMode;
 
 public class Main {
 	/**
@@ -19,9 +18,6 @@ public class Main {
 			Main.printUsageInformation();
 			return;
 		}
-		
-		// Default run mode: quiet
-		ExecutionMode mode = ExecutionMode.QUIET;
 		
 		// IO stream for all program and trace output
 		PrintStream printStream = System.out;
@@ -44,41 +40,10 @@ public class Main {
 						return;
 					}
 				}
-				else if (args[i].equals("-r")) {
-					// Set the execution mode
-					i++;
-					if (i < args.length) {
-						String modeString = args[i].toLowerCase();
-						if (modeString.equals("quiet")) {
-							mode = ExecutionMode.QUIET;
-						}
-						else if (modeString.equals("trace")) {
-							mode = ExecutionMode.TRACE;
-						}
-						else if (modeString.equals("step")) {
-							mode = ExecutionMode.STEP;
-						}
-						else {
-							Main.printUsageInformation();
-							return;
-						}
-					}
-					else {
-						Main.printUsageInformation();
-						return;
-					}
-				}
 				else {
 					Main.printUsageInformation();
 					return;
 				}
-			}
-			
-			// Don't let the user try to run in step mode and use an output file.
-			// They would have a blank screen waiting for them to press a key for each instruction.
-			if (printStream != System.out && mode == ExecutionMode.STEP) {
-				System.out.println("Executing in step mode with an output file is not allowed.");
-				return;
 			}
 			
 			// Path to the object file to load
@@ -100,10 +65,6 @@ public class Main {
 				// Load the file data into the memory bank
 				MemoryBank memory = new MemoryBank();
 				startAddress = Loader.load(fileData, memory);
-				
-				// Run it!
-				Machine machine = new Machine(printStream, memory);
-				machine.run(startAddress, mode);
 			}
 			catch (Exception e) {
 				printStream.println(e.getMessage());
@@ -145,5 +106,17 @@ public class Main {
 		}
         reader.close();
         return fileData.toString();
+    }
+	
+	/**
+	 * Writes all given text to the file existing at the given path location.
+	 * If the file already exists, it is overwritten. If not, it is created.
+	 * @param filename The filename of the file to write to.
+	 * @param data The text to write to the file.
+	 */
+	private static void writeAllText(String filename, String data) throws IOException {
+        BufferedWriter out = new BufferedWriter(new FileWriter(filename));
+		out.write(data);
+		out.close();
     }
 }

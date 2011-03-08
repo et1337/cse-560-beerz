@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import Simulator.state.MemoryBank;
+import Common.MemoryBank;
 import Simulator.state.MachineState;
 import Simulator.program.Machine;
 import Simulator.program.ExecutionMode;
