@@ -1,0 +1,1 @@
+java Simulator.Main %1

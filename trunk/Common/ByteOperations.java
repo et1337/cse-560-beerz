@@ -1,4 +1,4 @@
-package Assembler;
+package Common;
 
 /**
  * Utility class containing methods for dealing with bits and bytes.

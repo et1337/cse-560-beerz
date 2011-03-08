@@ -6,10 +6,12 @@ import java.io.FileReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
-// Main program.
 public class Main {
 
-	// Program entry point.
+	/**
+	 * Program entry point.
+	 * @param args Command line arguments.
+	 */
 	public static void main(String[] args) throws Exception {
 		// Print usage data if necessary
 		if (args.length < 2 || args[0].equals("--help") || args[0].equals("/?")) {
@@ -39,7 +41,11 @@ public class Main {
 			try {
 				program = assembler.assemble(filename, data);
 			} catch (Exception e) {
-				System.out.println(e.getMessage());
+				if (e.getMessage() != null) {
+					System.out.println(e.getMessage());
+				} else {
+					e.printStackTrace();
+				}
 			}
 			
 			if (program != null) {
@@ -52,12 +58,18 @@ public class Main {
 			return;
 		}
 		catch (Exception e) {
-			System.out.println(e.getMessage());
+			if (e.getMessage() != null) {
+				System.out.println(e.getMessage());
+			} else {
+				e.printStackTrace();
+			}
 			return;
 		}
 	}
 	
-	// Prints usage information for users of this program.
+	/**
+	 * Prints usage information for users of this program.
+	 */
 	private static void printUsageInformation() {
 		System.out.println("Usage:\tjava Main inputfile outputfile [options]");
 		System.out.println("\tinputfile\tSpecify path to input assembly file.");
@@ -65,7 +77,11 @@ public class Main {
 		System.out.println("\t-l\t\tGenerate and display source code listing.");
 	}
 	
-	// Returns all text in the file existing at the given path location.
+	/**
+	 * Reads all text in the file existing at the given path location into a string.
+	 * @param filename Path to the desired file.
+	 * @return A string containing all the data existing in the desired file.
+	 */
 	private static String readAllText(String filename) throws IOException {
         StringBuffer fileData = new StringBuffer();
         BufferedReader reader = new BufferedReader(new FileReader(filename));
@@ -79,8 +95,12 @@ public class Main {
         return fileData.toString();
     }
 	
-	// Writes all given text to the file existing at the given path location.
-	// If the file already exists, it is overwritten. If not, it is created.
+	/**
+	 * Writes all given text to the file existing at the given path location.
+	 * If the file already exists, it is overwritten. If not, it is created.
+	 * @param filename The filename of the file to write to.
+	 * @param data The text to write to the file.
+	 */
 	private static void writeAllText(String filename, String data) throws IOException {
         BufferedWriter out = new BufferedWriter(new FileWriter(filename));
 		out.write(data);

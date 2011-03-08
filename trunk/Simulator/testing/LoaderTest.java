@@ -2,7 +2,7 @@ package Simulator.testing;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import Simulator.state.MemoryBank;
+import Common.MemoryBank;
 import Simulator.program.Loader;
 
 /**

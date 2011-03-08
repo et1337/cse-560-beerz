@@ -1,4 +1,5 @@
 package Assembler;
+import Common.SymbolTable;
 
 /**
  * An Instruction corresponds to one line of assembly source code. It may

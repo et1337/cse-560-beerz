@@ -3,6 +3,10 @@ package Assembler;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.ArrayList;
+import Common.ByteOperations;
+import Common.Error;
+import Common.Symbol;
+import Common.SymbolTable;
 
 /**
  * The Assembler has no state; it contains a constant instruction definition
@@ -48,6 +52,8 @@ public class Assembler {
 		boolean relocatable = false;
 		boolean hasOrig = false;
 		boolean hasEnd = false;
+		
+		String[] exports = new String[] { };
 		
 		String[] lines = data.split("\n");
 		for (String line : lines) {
@@ -111,7 +117,7 @@ public class Assembler {
 						// .ORIG must be first instruction
 						errors.add(new Error(lineNumber, ".ORIG instruction must be first non-comment line."));
 					}
-					
+					instruction.setOperands(operands, literals);
 					instruction.setDefinition(new InstructionDefinition(
 							".ORIG", 0, false));
 					if (operands.length > 1) {
@@ -137,6 +143,7 @@ public class Assembler {
 						relocatable = true;
 					}
 				} else if (op.equals(".EQU")) {
+					instruction.setOperands(operands, literals);
 					instruction.setDefinition(new InstructionDefinition(".EQU",
 							0, false));
 					if (operands.length != 1 || label == "") {
@@ -147,7 +154,12 @@ public class Assembler {
 					else {
 						OperandType type = Operand.determineType(operands[0]);
 						if (type == OperandType.SYMBOL) {
-							symbols.define(label, operands[0]);
+							Symbol symbol = symbols.get(operands[0]);
+							if (symbol.isImport()) {
+								errors.add(new Error(lineNumber, ".EQU cannot be used with imported symbols."));
+							} else {
+								symbols.define(label, operands[0]);
+							}
 						} else if (type == OperandType.IMMEDIATE) {
 							symbols.define(new Symbol(label, Operand
 									.parseConstant(operands[0]), false));
@@ -226,8 +238,12 @@ public class Assembler {
 					instruction.setDefinition(new InstructionDefinition(
 						".END", new int[] { }, ops));
 					if (operands.length > 0) {
-						startAddress = Operand.getValue(operands[0], symbols,
-							instruction.getDefinition().getOperandDefinitions()[0], literals);
+						startAddress = Operand.getValue(
+							operands[0],
+							symbols,
+							instruction.getDefinition().getOperandDefinitions()[0],
+							Operand.determineType(operands[0]),
+							literals);
 					} else {
 						startAddress = origin; // Default start address = origin.
 					}
@@ -242,22 +258,56 @@ public class Assembler {
 						size = Operand.getValue(operands[0], symbols, new OperandDefinition(
 								false, new OperandType[] {
 									OperandType.IMMEDIATE,
-									OperandType.SYMBOL },
-								15, 0),
-							literals);
+									OperandType.SYMBOL }, 15, 0),
+							Operand.determineType(operands[0]), literals);
 						if (size < 0) { // Operand.getValue will allow negative numbers.
 							size = 0;
 							errors.add(new Error(lineNumber, ".BLKW requires a positive operand."));
 						}
 					}
+					instruction.setOperands(operands, literals);
 					instruction.setDefinition(new InstructionDefinition(
 							".BLKW", size, false));
+				} else if (op.equals(".ENT")) {
+					instruction.setOperands(operands, literals);
+					instruction.setDefinition(new InstructionDefinition(".END", 0, false));
+					if (!label.equals("")) {
+						errors.add(new Error(lineNumber, "No label allowed on .ENT instruction."));
+					}
+					if (operands.length == 0) {
+						errors.add(new Error(lineNumber, ".ENT requires at least one operand."));
+					} else {
+						for (String operand : operands) {
+							if (Operand.determineType(operand) != OperandType.SYMBOL) {
+								errors.add(new Error(lineNumber, ".ENT operand \"" + operand +
+									"\" must be a valid symbol name."));
+							}
+						}
+						exports = operands;
+					}
+				} else if (op.equals(".EXT")) {
+					instruction.setOperands(operands, literals);
+					instruction.setDefinition(new InstructionDefinition(".EXT", 0, false));
+					if (!label.equals("")) {
+						errors.add(new Error(lineNumber, "No label allowed on .EXT instruction."));
+					}
+					if (operands.length == 0) {
+						errors.add(new Error(lineNumber, ".EXT requires at least one operand."));
+					} else {
+						for (String operand : operands) {
+							if (Operand.determineType(operand) != OperandType.SYMBOL) {
+								errors.add(new Error(lineNumber, ".EXT operand \"" + operand +
+									"\" must be a valid symbol name."));
+							} else {
+								symbols.define(new Symbol(operand));
+							}
+						}
+					}
 				} else {
 					// The instruction is not a pseudo-op. Look it up in the
 					// instruction definition table.
 					instruction.setOperands(operands, literals);
-					InstructionDefinition definition = this
-							.getInstructionDefinition(instruction);
+					InstructionDefinition definition = this.getInstructionDefinition(instruction);
 					if (definition == null) {
 						// Error
 						errors.add(new Error(lineNumber, "Could not find definition for " +
@@ -275,8 +325,12 @@ public class Assembler {
 				instructions.add(instruction);
 				
 			} catch (Exception e) {
-				// Error handling
-				errors.add(new Error(lineNumber, e.getMessage()));
+				if (e.getMessage() != null) {
+					// Error handling
+					errors.add(new Error(lineNumber, e.getMessage()));
+				} else {
+					e.printStackTrace();
+				}
 			}
 			
 			lineNumber++;
@@ -306,6 +360,15 @@ public class Assembler {
 		
 		if (!hasOrig || !hasEnd) {
 			errors.add(new Error("Program is missing .ORIG and/or .END instructions."));
+		}
+		
+		for (String export : exports) {
+			Symbol symbol = symbols.get(export);
+			if (symbol == null) {
+				errors.add(new Error("Undefined .ENT symbol \"" + export + "\"."));
+			} else {
+				symbol.setExport();
+			}
 		}
 		
 		if (errors.size() > 0) {

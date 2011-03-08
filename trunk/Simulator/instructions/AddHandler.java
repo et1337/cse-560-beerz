@@ -1,8 +1,8 @@
 package Simulator.instructions;
 
 import Simulator.state.MachineState;
-import Simulator.state.MemoryBank;
-import Simulator.util.ByteOperations;
+import Common.MemoryBank;
+import Common.ByteOperations;
 import java.io.PrintStream;
 import java.io.InputStream;
 

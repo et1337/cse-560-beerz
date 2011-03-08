@@ -1,4 +1,4 @@
-package Assembler;
+package Common;
 
 public class Error {
 	/**

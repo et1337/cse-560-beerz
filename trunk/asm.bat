@@ -1,0 +1,1 @@
+java Assembler.Main %1 test.out -l
