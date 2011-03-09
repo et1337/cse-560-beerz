@@ -5,7 +5,10 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintStream;
+import java.util.List;
+import java.util.LinkedList;
 import Common.MemoryBank;
+import Common.SymbolTable;
 
 public class Main {
 	/**
@@ -22,8 +25,11 @@ public class Main {
 		// IO stream for all program and trace output
 		PrintStream printStream = System.out;
 		
+		List<String> inputFiles = new LinkedList<String>();
+		
 		try {
-			for (int i = 1; i < args.length; i++) {
+			boolean hasOutputFile = false;
+			for (int i = 0; i < args.length; i++) {
 				if (args[i].equals("-o")) {
 					// Set up an output file
 					i++;
@@ -39,6 +45,10 @@ public class Main {
 						Main.printUsageInformation();
 						return;
 					}
+					hasOutputFile = true;
+				}
+				else if (!hasOutputFile) {
+					inputFiles.add(args[i]);
 				}
 				else {
 					Main.printUsageInformation();
@@ -46,25 +56,56 @@ public class Main {
 				}
 			}
 			
-			// Path to the object file to load
-			String filename = args[0];
-			
-			// Load all the file data into a string
-			String fileData = "";
-			try {
-				fileData = Main.readAllText(filename);
-			}
-			catch (IOException e) {
-				System.out.println("Failed to open file \"" + filename + "\" for reading.");
+			if (!hasOutputFile) {
+				Main.printUsageInformation();
 				return;
 			}
 			
+			// Load all the file data into a string
+			List<String> fileData = new LinkedList<String>();
+			for (String inputFile : inputFiles) {
+				try {
+					fileData.add(Main.readAllText(inputFile));
+				}
+				catch (IOException e) {
+					System.out.println("Failed to open file \"" + inputFile + "\" for reading.");
+					return;
+				}
+			}
 			
-			int startAddress = 0;
+			List<ObjectFile> objectFiles = new LinkedList<ObjectFile>();
+			List<SymbolTable> symbolTables = new LinkedList<SymbolTable>();
+			
+			for (String file : fileData) {
+				try {
+					ObjectFile objectFile = Loader.load(file);
+					objectFiles.add(objectFile);
+					symbolTables.add(objectFile.getSymbols());
+				}
+				catch (Exception e) {
+					printStream.println(e.getMessage());
+					return;
+				}
+			}
+			
 			try {
-				// Load the file data into the memory bank
-				MemoryBank memory = new MemoryBank();
-				startAddress = Loader.load(fileData, memory);
+				int i = 0;
+				MemoryBank bank = null;
+				int startAddress = 0;
+				for (ObjectFile file : objectFiles) {
+					if (i == 0) {
+						startAddress = file.getStartAddress();
+						bank = file.getMemoryBank();
+					}
+					else {
+						MemoryBank other = file.getMemoryBank();
+						SymbolTable symbols = file.getSymbols();
+						symbols.relocate(0, bank.getLastAddress() + 1);
+						other.resolveSymbols(symbolTables, file.getSymbolEntries());
+						other.relocate(0, bank.getLastAddress() + 1, file.getRelocationRecords()).insertInto(bank);
+					}
+					i++;
+				}
 			}
 			catch (Exception e) {
 				printStream.println(e.getMessage());
@@ -83,11 +124,7 @@ public class Main {
 	 * Prints usage information for users of this program.
 	 */
 	private static void printUsageInformation() {
-		System.out.println("Usage:\tjava Main inputfile [options]");
-		System.out.println("\t-o outputfile\tRedirect output to specified file.");
-		System.out.println("\t-r quiet\tRun the program in quiet mode.");
-		System.out.println("\t-r trace\tRun the program in trace mode.");
-		System.out.println("\t-r step\tRun the program in step mode.");
+		System.out.println("Usage:\tjava Loader.Main [inputfiles] -o outfile");
 	}
 	
 	/**

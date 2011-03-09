@@ -71,7 +71,7 @@ public class Main {
 	 * Prints usage information for users of this program.
 	 */
 	private static void printUsageInformation() {
-		System.out.println("Usage:\tjava Main inputfile outputfile [options]");
+		System.out.println("Usage:\tjava Assembler.Main inputfile outputfile [options]");
 		System.out.println("\tinputfile\tSpecify path to input assembly file.");
 		System.out.println("\toutputfile\tSpecify path to output object file.");
 		System.out.println("\t-l\t\tGenerate and display source code listing.");

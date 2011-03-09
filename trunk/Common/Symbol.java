@@ -64,6 +64,14 @@ public class Symbol {
 	}
 	
 	/**
+	 * Sets the value of this Symbol.
+	 * @param the new value for this Symbol.
+	 */
+	public void setValue(int value) {
+		this.value = value;
+	}
+	
+	/**
 	 * Gets the value of this Symbol.
 	 * @return the Integer value of the Symbol
 	 */

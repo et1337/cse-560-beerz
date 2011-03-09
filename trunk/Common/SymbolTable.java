@@ -69,4 +69,17 @@ public class SymbolTable {
 	public Collection<Symbol> getSymbols() {
 		return this.map.values();
 	}
+	
+	/**
+	 * Relocate all relocatable symbols from a to b.
+	 * @param a the original start address.
+	 * @param b the new start address.
+	 */
+	public void relocate(int a, int b) {
+		for (Symbol symbol : this.map.values()) {
+			if (symbol.isRelocatable()) {
+				symbol.setValue(symbol.getValue() + b - a);
+			}
+		}
+	}
 }
