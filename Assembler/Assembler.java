@@ -268,7 +268,7 @@ public class Assembler {
 							".BLKW", size, false));
 				} else if (op.equals(".ENT")) {
 					instruction.setOperands(operands, literals);
-					instruction.setDefinition(new InstructionDefinition(".END", 0, false));
+					instruction.setDefinition(new InstructionDefinition(".ENT", 0, false));
 					if (!label.equals("")) {
 						errors.add(new Error(lineNumber, "No label allowed on .ENT instruction."));
 					}

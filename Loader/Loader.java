@@ -161,7 +161,7 @@ public class Loader {
 				}
 				else {
 					// Syntax error
-					errors.add(new Error(lineNumber, "First character of line is invalid; must be 'H', 'T', or 'E'."));
+					errors.add(new Error(lineNumber, "First character of line is invalid; must be 'H', 'T', 'E', 'I', or 'X'."));
 				}
 			} catch (Exception e) {
 				errors.add(new Error(lineNumber, e.getMessage()));
