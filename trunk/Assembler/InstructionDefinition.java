@@ -98,15 +98,15 @@ public class InstructionDefinition
 									OperandType.SYMBOL }, 8, 0) }),
 			new InstructionDefinition("DBUG", new int[] { 0x8000 },
 					new OperandDefinition[] {}),
-			new InstructionDefinition("JSR", new int[] { 0x4000 },
+			new InstructionDefinition("JSR", new int[] { 0x4800 },
 					new OperandDefinition[] { new OperandDefinition(true,
 							new OperandType[] { OperandType.IMMEDIATE,
 									OperandType.SYMBOL }, 8, 0) }),
-			new InstructionDefinition("JMP", new int[] { 0x4800 },
+			new InstructionDefinition("JMP", new int[] { 0x4000 },
 					new OperandDefinition[] { new OperandDefinition(true,
 							new OperandType[] { OperandType.IMMEDIATE,
 									OperandType.SYMBOL }, 8, 0) }),
-			new InstructionDefinition("JSRR", new int[] { 0xC000 },
+			new InstructionDefinition("JSRR", new int[] { 0xC800 },
 					new OperandDefinition[] {
 							new OperandDefinition(false, new OperandType[] {
 									OperandType.REGISTER,
@@ -114,7 +114,7 @@ public class InstructionDefinition
 							new OperandDefinition(false, new OperandType[] {
 									OperandType.IMMEDIATE,
 									OperandType.SYMBOL }, 5, 0) }),
-			new InstructionDefinition("JMPR", new int[] { 0xC800 },
+			new InstructionDefinition("JMPR", new int[] { 0xC000 },
 					new OperandDefinition[] {
 							new OperandDefinition(false, new OperandType[] {
 									OperandType.REGISTER,

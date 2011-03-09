@@ -1,1 +1,1 @@
-javac Loader\*.java
+javac Common/*.java Loader/*.java

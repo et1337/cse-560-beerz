@@ -59,6 +59,14 @@ public class SymbolEntry {
 	}
 	
 	/**
+	 * Sets the address of this SymbolEntry.
+	 * @param a the new address of the SymbolEntry
+	 */
+	public void setAddress(int a) {
+		this.address = a;
+	}
+	
+	/**
 	 *  Gets the least significant bit to insert the Symbol into.
 	 *  @return the least significant bit to insert the Symbol into.
 	 */

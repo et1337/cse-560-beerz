@@ -1,1 +1,1 @@
-javac Assembler/*.java
+javac Common/*.java Assembler/*.java

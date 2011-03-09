@@ -121,7 +121,7 @@ public class Operand {
 			return symbols.hasSymbol(value) && symbols.get(value).isRelocatable();
 		}
 		else {
-			return this.getDefinition().isRelocatable();
+			return false;
 		}
 	}
 

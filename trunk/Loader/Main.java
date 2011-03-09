@@ -102,13 +102,24 @@ public class Main {
 			List<ObjectFile> objectFiles = new LinkedList<ObjectFile>();
 			List<SymbolTable> symbolTables = new LinkedList<SymbolTable>();
 			
+			String segmentName = "      ";
+			int startAddress = 0;
+			
 			int address = origin;
+			int i = 0;
 			for (String file : fileData) {
 				try {
 					ObjectFile objectFile = Loader.load(file);
-					if (objectFile.isRelocatable())
-						objectFile.getSymbols().relocate(0, address);
-					objectFile.getMemoryBank().relocate(0, address, objectFile.getRelocationRecords());
+					if (address != 0) {
+						if (objectFile.isRelocatable())
+							objectFile.relocate(0, address);
+						else
+							throw new Exception("Object file \"" + file + "\" was expected to be relocatable, but is not.");
+					}
+					if (i == 0) {
+						startAddress = objectFile.getStartAddress();
+						segmentName = objectFile.getSegmentName();
+					}
 					address = objectFile.getMemoryBank().getLastAddress() + 1;
 					objectFiles.add(objectFile);
 					symbolTables.add(objectFile.getSymbols());
@@ -117,27 +128,23 @@ public class Main {
 					printStream.println(e.getMessage());
 					return;
 				}
+				i++;
 			}
 			
-			// TODO: make sure the relocated programs don't span multiple memory pages
-			
 			try {
-				int i = 0;
-				MemoryBank result = null;
-				int startAddress = 0;
+				MemoryBank result = new MemoryBank();
 				for (ObjectFile file : objectFiles) {
 					MemoryBank bank = file.getMemoryBank();
 					bank.resolveSymbols(symbolTables, file.getSymbolEntries());
-					if (i == 0) {
-						startAddress = file.getStartAddress();
-						result = bank;
-					}
-					else {
-						bank.insertInto(result);
-					}
-					i++;
+					bank.insertInto(result);
 				}
-				String header = "H" + ByteOperations.getHex(result.getFirstAddress(), 4) + ByteOperations.getHex(result.getLastAddress(), 4);
+				// If we relocated any files, make sure they don't span multiple memory pages
+				if (objectFiles.size() > 1 && (result.getFirstAddress() & 0xFE00) != (result.getLastAddress() & 0xFE00)) {
+					throw new Exception("Resulting program would span multiple memory pages. " +
+						" First address: " + ByteOperations.getHex(result.getFirstAddress(), 4) + 
+						" Last address: " + ByteOperations.getHex(result.getLastAddress(), 4));
+				}
+				String header = "H" + segmentName + ByteOperations.getHex(result.getFirstAddress(), 4) + ByteOperations.getHex(1 + result.getLastAddress() - result.getFirstAddress(), 4);
 				String textRecords = result.getRecords();
 				String end = "E" + ByteOperations.getHex(startAddress, 4);
 				if (generateListing) {
@@ -167,6 +174,7 @@ public class Main {
 		System.out.println("Usage:\tjava Loader.Main [inputfiles] -o outfile [options]");
 		System.out.println("\t-l\tGenerate listing");
 		System.out.println("\t-a addr\tRelocate program to addr (4-digit hex memory address)");
+		System.out.println("Note: if linking an absolute object file, it must come first in the file list.");
 	}
 	
 	/**
