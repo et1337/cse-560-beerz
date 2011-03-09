@@ -64,7 +64,6 @@ public class Main {
 		catch (Exception e) {
 			if (e.getMessage() != null) {
 				System.out.println(e.getMessage());
-				e.printStackTrace();
 			} else {
 				e.printStackTrace();
 			}
