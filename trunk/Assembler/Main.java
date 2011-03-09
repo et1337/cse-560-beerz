@@ -47,21 +47,14 @@ public class Main {
 			for (String inputFile : inputFiles) {
 				String data = Main.readAllText(inputFile);
 				Assembler assembler = new Assembler();
-				Program program = null;
-				try {
-					program = assembler.assemble(inputFile, data);
-				} catch (Exception e) {
-					if (e.getMessage() != null) {
-						System.out.println(e.getMessage());
-					} else {
-						e.printStackTrace();
-					}
-				}
+				Program program = assembler.assemble(inputFile, data);
 				
-				if (program != null) {
-					String result = program.getCode(generateListing);
-					Main.writeAllText(inputFile.substring(0, inputFile.lastIndexOf('.')) + ".out", result);
+				String result = program.getCode(generateListing);
+				int dot = inputFile.lastIndexOf('.');
+				if (dot == -1) {
+					dot = inputFile.length();
 				}
+				Main.writeAllText(inputFile.substring(0, dot) + ".out", result);
 			}
 		}
 		catch (IOException e) {
@@ -71,6 +64,7 @@ public class Main {
 		catch (Exception e) {
 			if (e.getMessage() != null) {
 				System.out.println(e.getMessage());
+				e.printStackTrace();
 			} else {
 				e.printStackTrace();
 			}

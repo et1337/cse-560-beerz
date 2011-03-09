@@ -462,6 +462,6 @@ public class Assembler {
 	 * @return the segment name from the program
 	 */
 	protected String getNameFromFilename(String filename) {
-		return String.format("%1$-6s", filename.substring(0, 6));
+		return String.format("%1$-6s", filename.substring(0, Math.min(filename.length(), 6)));
 	}
 }
