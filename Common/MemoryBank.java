@@ -2,6 +2,7 @@ package Common;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * A MemoryBank represents the state of memory in a Machine.
@@ -20,6 +21,16 @@ public class MemoryBank {
 	private Map<Integer, Short> data;
 	
 	/**
+	 * The first address with data in this MemoryBank.
+	 */
+	private int firstAddress = Integer.MAX_VALUE;
+	
+	/**
+	 * The last address with data in this MemoryBank.
+	 */
+	private int lastAddress;
+	
+	/**
 	 * Creates a new MemoryBank with zeroes for all memory values.
 	 */
 	public MemoryBank() {
@@ -32,6 +43,10 @@ public class MemoryBank {
 	 * @param value The 16-bit signed value to store in the memory cell.
 	 */
 	public void write(int address, short value) {
+		if (address > this.lastAddress)
+			this.lastAddress = address;
+		if (address < this.firstAddress)
+			this.firstAddress = address;
 		this.data.put(address, value);
 	}
 	
@@ -44,6 +59,22 @@ public class MemoryBank {
 		if (this.data.containsKey(address))
 			return this.data.get(address);
 		return 0;
+	}
+	
+	/**
+	 * Gets the first address with data in this MemoryBank.
+	 * @return the first address with data in this MemoryBank.
+	 */
+	public int getFirstAddress() {
+		return this.firstAddress;
+	}
+	
+	/**
+	 * Gets the last address with data in this MemoryBank.
+	 * @return the last address with data in this MemoryBank.
+	 */
+	public int getLastAddress() {
+		return this.lastAddress;
 	}
 	
 	/**
@@ -67,6 +98,64 @@ public class MemoryBank {
 			}
 			line.append(ByteOperations.getHex(this.read(i), 4));
 			line.append(" ");
+		}
+	}
+	
+	/**
+	 * Return a copy of this MemoryBank, with the data relocated from the given starting location
+	 * to the given new location, using the given relocation records.
+	 * @param a the original start address.
+	 * @param b the new start address.
+	 * @param relocationRecords a List of relocation records used to modify the text records.
+	 * @return a new Memory
+	 */
+	public MemoryBank relocate(int a, int b, List<SymbolEntry> relocationRecords) {
+		for (SymbolEntry entry : relocationRecords) {
+			short value = this.read(entry.getAddress());
+			short address = (short)((value & entry.getMask()) >> entry.getLeastSignificantBit());
+			address += b - a;
+			value &= entry.getInverseMask();
+			value |= (address << entry.getLeastSignificantBit()) & entry.getMask();
+		}
+		MemoryBank bank = new MemoryBank();
+		for (Map.Entry<Integer, Short> entry : this.data.entrySet()) {
+			bank.write(entry.getKey() + b - a, entry.getValue());
+		}
+		return bank;
+	}
+	
+	/**
+	 * Insert values from the given SymbolTables into the memory locations specified by the given
+	 * List of SymbolEntries.
+	 * @param symbols List of SymbolTables to pull values from.
+	 * @param symbolEntries List of SymbolEntries specifying where in memory the Symbols are to be inserted.
+	 */
+	public void resolveSymbols(List<SymbolTable> symbols, List<SymbolEntry> symbolEntries) throws Exception {
+		for (SymbolEntry entry : symbolEntries) {
+			short value = this.read(entry.getAddress());
+			boolean foundNewValue = false;
+			short newValue = 0;
+			for (SymbolTable table : symbols) {
+				if (table.hasSymbol(entry.getSymbol())) {
+					newValue = (short)table.get(entry.getSymbol()).getValue();
+					foundNewValue = true;
+				}
+			}
+			if (!foundNewValue)
+				throw new Exception("Undefined symbol \"" + entry.getSymbol() + "\".");
+			value &= entry.getInverseMask();
+			value |= (newValue << entry.getLeastSignificantBit()) & entry.getMask();
+			this.write(entry.getAddress(), value);
+		}
+	}
+	
+	/**
+	 * Insert the data from this MemoryBank into the given MemoryBank, overwriting any overlapping data.
+	 * @param bank the MemoryBank to insert data into.
+	 */
+	public void insertInto(MemoryBank bank) {
+		for (Map.Entry<Integer, Short> entry : this.data.entrySet()) {
+			bank.write(entry.getKey(), entry.getValue());
 		}
 	}
 }

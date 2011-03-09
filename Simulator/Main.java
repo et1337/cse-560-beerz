@@ -122,7 +122,7 @@ public class Main {
 	 * Prints usage information for users of this program.
 	 */
 	private static void printUsageInformation() {
-		System.out.println("Usage:\tjava Main inputfile [options]");
+		System.out.println("Usage:\tjava Simulator.Main inputfile [options]");
 		System.out.println("\t-o outputfile\tRedirect output to specified file.");
 		System.out.println("\t-r quiet\tRun the program in quiet mode.");
 		System.out.println("\t-r trace\tRun the program in trace mode.");

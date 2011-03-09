@@ -101,7 +101,7 @@ public class Program {
 		
 		for (Symbol symbol : this.symbols.getSymbols()) {
 			if (symbol.isExport()) {
-				result.append("E");
+				result.append("X");
 				if (symbol.isRelocatable()) {
 					result.append("R");
 				} else {

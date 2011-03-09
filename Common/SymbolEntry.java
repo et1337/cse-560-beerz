@@ -1,4 +1,4 @@
-package Loader;
+package Common;
 
 /**
  *  A SymbolEntry consists of a symbol, an address, and a bit mask.
@@ -27,12 +27,19 @@ public class SymbolEntry {
 	
 	/**
 	 * Instantiates a new SymbolEntry with the given Symbol, address, and bit mask.
-	 * */
+	 */
 	public SymbolEntry(String symbol, int address, int mostSignificantBit, int leastSignificantBit) {
 		this.symbol = symbol;
 		this.address = address;
 		this.mostSignificantBit = mostSignificantBit;
 		this.leastSignificantBit = leastSignificantBit;
+	}
+	
+	/**
+	 * Instantiates a new SymbolEntry with no symbol (indicating a relocation record).
+	 */
+	public SymbolEntry(int address, int mostSignificantBit, int leastSignificantBit) {
+		this(null, address, mostSignificantBit, leastSignificantBit);
 	}
 	
 	/**
@@ -65,5 +72,30 @@ public class SymbolEntry {
 	 */
 	public int getMostSignificantBit() {
 		return this.mostSignificantBit;
+	}
+	
+	/**
+	 * Get bitmask for this SymbolEntry.
+	 */
+	public short getMask() {
+		short result = 0;
+		for (int i = this.mostSignificantBit; i >= this.leastSignificantBit; i--) {
+			result |= 1 << i;
+		}
+		return result;
+	}
+	
+	/**
+	 * Get inverse bitmask for this SymbolEntry.
+	 */
+	public short getInverseMask() {
+		short result = 0;
+		for (int i = 16; i > this.mostSignificantBit; i--) {
+			result |= 1 << i;
+		}
+		for (int i = this.leastSignificantBit - 1; i >= 0; i--) {
+			result |= 1 << i;
+		}
+		return result;
 	}
 }

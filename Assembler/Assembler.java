@@ -39,8 +39,6 @@ public class Assembler {
 	 */
 	public Program assemble(String filename, String data) throws Exception {
 		List<Error> errors = new LinkedList<Error>();
-	
-		
 		SymbolTable symbols = new SymbolTable();
 		LiteralTable literals = new LiteralTable();
 		List<Instruction> instructions = new LinkedList<Instruction>();

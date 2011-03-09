@@ -1,1 +1,1 @@
-java Loader.Main %1
+java Loader.Main %*
