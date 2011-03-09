@@ -1,8 +1,9 @@
 package Common;
 
 /**
- *  A Symbol is basically a name/value pair with an extra flag that
- * defines whether the Symbol is relocatable or consant.
+ * A Symbol is basically a name/value pair with an extra flag that
+ * defines whether the Symbol is relocatable or consant. There are also flags
+ * indicating whether the Symbol is imported, exported, or neither.
  */
 public class Symbol {
 	

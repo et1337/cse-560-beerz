@@ -83,7 +83,7 @@ public class SymbolEntry {
 	}
 	
 	/**
-	 * Get bitmask for this SymbolEntry.
+	 * Gets the bitmask for this SymbolEntry.
 	 */
 	public short getMask() {
 		short result = 0;
@@ -94,7 +94,7 @@ public class SymbolEntry {
 	}
 	
 	/**
-	 * Get inverse bitmask for this SymbolEntry.
+	 * Gets the inverted bitmask for this SymbolEntry.
 	 */
 	public short getInverseMask() {
 		short result = 0;

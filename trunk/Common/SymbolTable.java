@@ -63,7 +63,7 @@ public class SymbolTable {
 	}
 	
 	/**
-	 *  Gets the set of all address/value pairs in this table.
+	 * Gets the set of all address/value pairs in this table.
 	 * @return the set of all address/value pairs
 	 */
 	public Collection<Symbol> getSymbols() {
