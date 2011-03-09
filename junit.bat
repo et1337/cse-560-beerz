@@ -1,1 +1,1 @@
-for /f %%a IN ('dir /b %1\*.java') do call java org.junit.runner.JUnitCore testing.%%~na
+for /f %%a IN ('dir /b Simulator\testing\*.java') do call java org.junit.runner.JUnitCore Simulator.testing.%%~na

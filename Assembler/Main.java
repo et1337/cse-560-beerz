@@ -5,6 +5,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.util.List;
+import java.util.LinkedList;
 
 public class Main {
 
@@ -19,14 +21,16 @@ public class Main {
 			return;
 		}
 		
-		String filename = args[0];
-		String outFile = args[1];
+		List<String> inputFiles = new LinkedList<String>();
 		boolean generateListing = false;
 		
-		for (int i = 2; i < args.length; i++) {
+		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-l")) {
 				// Generate a listing
 				generateListing = true;
+			}
+			else if (!generateListing) {
+				inputFiles.add(args[i]);
 			}
 			else {
 				Main.printUsageInformation();
@@ -34,23 +38,30 @@ public class Main {
 			}
 		}
 		
+		if (inputFiles.size() == 0) {
+			Main.printUsageInformation();
+			return;
+		}
+		
 		try {
-			String data = Main.readAllText(filename);
-			Assembler assembler = new Assembler();
-			Program program = null;
-			try {
-				program = assembler.assemble(filename, data);
-			} catch (Exception e) {
-				if (e.getMessage() != null) {
-					System.out.println(e.getMessage());
-				} else {
-					e.printStackTrace();
+			for (String inputFile : inputFiles) {
+				String data = Main.readAllText(inputFile);
+				Assembler assembler = new Assembler();
+				Program program = null;
+				try {
+					program = assembler.assemble(inputFile, data);
+				} catch (Exception e) {
+					if (e.getMessage() != null) {
+						System.out.println(e.getMessage());
+					} else {
+						e.printStackTrace();
+					}
 				}
-			}
-			
-			if (program != null) {
-				String result = program.getCode(generateListing);
-				Main.writeAllText(outFile, result);
+				
+				if (program != null) {
+					String result = program.getCode(generateListing);
+					Main.writeAllText(inputFile.substring(0, inputFile.lastIndexOf('.')) + ".out", result);
+				}
 			}
 		}
 		catch (IOException e) {
@@ -71,9 +82,8 @@ public class Main {
 	 * Prints usage information for users of this program.
 	 */
 	private static void printUsageInformation() {
-		System.out.println("Usage:\tjava Assembler.Main inputfile outputfile [options]");
-		System.out.println("\tinputfile\tSpecify path to input assembly file.");
-		System.out.println("\toutputfile\tSpecify path to output object file.");
+		System.out.println("Usage:\tjava Assembler.Main inputfiles [options]");
+		System.out.println("\tinputfiles\tSpecify path to input assembly files.");
 		System.out.println("\t-l\t\tGenerate and display source code listing.");
 	}
 	

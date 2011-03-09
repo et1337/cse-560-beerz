@@ -3,6 +3,9 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.LinkedList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * A MemoryBank represents the state of memory in a Machine.
@@ -115,6 +118,7 @@ public class MemoryBank {
 			address += b - a;
 			value &= entry.getInverseMask();
 			value |= (address << entry.getLeastSignificantBit()) & entry.getMask();
+			this.write(entry.getAddress(), value);
 		}
 		MemoryBank bank = new MemoryBank();
 		for (Map.Entry<Integer, Short> entry : this.data.entrySet()) {
@@ -166,7 +170,14 @@ public class MemoryBank {
 	 */
 	public String getRecords() {
 		StringBuffer result = new StringBuffer();
-		for (Map.Entry<Integer, Short> entry : this.data.entrySet()) {
+		List<Map.Entry<Integer, Short>> list = new LinkedList<Map.Entry<Integer, Short>>(this.data.entrySet());
+		Collections.sort(list, new Comparator() {
+			public int compare(Object o1, Object o2) {
+				return ((Comparable) ((Map.Entry) (o1)).getKey())
+				.compareTo(((Map.Entry) (o2)).getKey());
+			}
+		});
+		for (Map.Entry<Integer, Short> entry : list) {
 			result.append("T");
 			result.append(ByteOperations.getHex(entry.getKey(), 4));
 			result.append(ByteOperations.getHex(entry.getValue(), 4));

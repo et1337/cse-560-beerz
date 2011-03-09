@@ -68,6 +68,7 @@ public class Loader {
 		MemoryBank memory = new MemoryBank();
 		List<SymbolEntry> symbolEntries = new LinkedList<SymbolEntry>();
 		List<SymbolEntry> relocationRecords = new LinkedList<SymbolEntry>();
+		String segmentName = "";
 		for (String line : data.split("\n")) {
 			try {
 				line = line.trim();
@@ -83,6 +84,7 @@ public class Loader {
 						relocatable = true;
 					else
 						firstAddress = ByteOperations.parseHex(line.substring(7, 11));
+					segmentName = line.substring(1, 7);
 					lastAddress = firstAddress + ByteOperations.parseHex(line.substring(11)) - 1;
 					if(firstAddress > Loader.MAX_ADDRESS || lastAddress > Loader.MAX_ADDRESS) {
 						errors.add(new Error(lineNumber, "Memory segment length is too large for virtual machine."));
@@ -179,9 +181,9 @@ public class Loader {
 		if (errors.size() > 0) {
 			// We have errors; throw an exception describing them
 			StringBuffer msg = new StringBuffer();
-			for(Error e : errors) {
+			for (Error e : errors) {
 				msg.append("Load error: ");
-				if(e.hasLineNumber()) {
+				if (e.hasLineNumber()) {
 					msg.append("Line ");
 					msg.append(Integer.toString(e.getLineNumber()));
 					msg.append(" - ");
@@ -192,7 +194,7 @@ public class Loader {
 			throw new Exception(msg.toString());
 		}
 		
-		return new ObjectFile(symbolEntries, relocationRecords, symbols, memory, relocatable, startAddress);
+		return new ObjectFile(symbolEntries, relocationRecords, symbols, memory, relocatable, startAddress, segmentName);
 	}
 	
 	/**

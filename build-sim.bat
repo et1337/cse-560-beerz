@@ -1,2 +1,1 @@
-javac Simulator/*.java
-javac Simulator/testing/*.java
+javac Common/*.java Simulator/*.java Simulator/testing/*.java Simulator/state/*.java Simulator/instructions/*.java Simulator/program/*.java
