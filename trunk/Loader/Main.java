@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.LinkedList;
 import Common.MemoryBank;
 import Common.SymbolTable;
+import Common.ByteOperations;
 
 public class Main {
 	/**
@@ -24,8 +25,13 @@ public class Main {
 		
 		// IO stream for all program and trace output
 		PrintStream printStream = System.out;
+		PrintStream outputStream = null;
 		
 		List<String> inputFiles = new LinkedList<String>();
+		
+		boolean generateListing = false;
+		
+		int origin = 0;
 		
 		try {
 			boolean hasOutputFile = false;
@@ -33,10 +39,11 @@ public class Main {
 				if (args[i].equals("-o")) {
 					// Set up an output file
 					i++;
-					if(i < args.length) {
+					if (i < args.length) {
 						try {
-							printStream = new PrintStream(args[i]);
-						} catch (IOException e) {
+							outputStream = new PrintStream(args[i]);
+						}
+						catch (IOException e) {
 							System.out.println("Failed to open file \"" + args[i] + "\" for writing.");
 							return;
 						}
@@ -49,6 +56,25 @@ public class Main {
 				}
 				else if (!hasOutputFile) {
 					inputFiles.add(args[i]);
+				}
+				else if (args[i].equals("-l")) {
+					generateListing = true;
+				}
+				else if (args[i].equals("-a")) {
+					i++;
+					if (i < args.length) {
+						try {
+							origin = ByteOperations.parseHex(args[i]);
+						}
+						catch (Exception e) {
+							Main.printUsageInformation();
+							return;
+						}
+					}
+					else {
+						Main.printUsageInformation();
+						return;
+					}
 				}
 				else {
 					Main.printUsageInformation();
@@ -76,9 +102,14 @@ public class Main {
 			List<ObjectFile> objectFiles = new LinkedList<ObjectFile>();
 			List<SymbolTable> symbolTables = new LinkedList<SymbolTable>();
 			
+			int address = origin;
 			for (String file : fileData) {
 				try {
 					ObjectFile objectFile = Loader.load(file);
+					if (objectFile.isRelocatable())
+						objectFile.getSymbols().relocate(0, address);
+					objectFile.getMemoryBank().relocate(0, address, objectFile.getRelocationRecords());
+					address = objectFile.getMemoryBank().getLastAddress() + 1;
 					objectFiles.add(objectFile);
 					symbolTables.add(objectFile.getSymbols());
 				}
@@ -88,24 +119,35 @@ public class Main {
 				}
 			}
 			
+			// TODO: make sure the relocated programs don't span multiple memory pages
+			
 			try {
 				int i = 0;
-				MemoryBank bank = null;
+				MemoryBank result = null;
 				int startAddress = 0;
 				for (ObjectFile file : objectFiles) {
+					MemoryBank bank = file.getMemoryBank();
+					bank.resolveSymbols(symbolTables, file.getSymbolEntries());
 					if (i == 0) {
 						startAddress = file.getStartAddress();
-						bank = file.getMemoryBank();
+						result = bank;
 					}
 					else {
-						MemoryBank other = file.getMemoryBank();
-						SymbolTable symbols = file.getSymbols();
-						symbols.relocate(0, bank.getLastAddress() + 1);
-						other.resolveSymbols(symbolTables, file.getSymbolEntries());
-						other.relocate(0, bank.getLastAddress() + 1, file.getRelocationRecords()).insertInto(bank);
+						bank.insertInto(result);
 					}
 					i++;
 				}
+				String header = "H" + ByteOperations.getHex(result.getFirstAddress(), 4) + ByteOperations.getHex(result.getLastAddress(), 4);
+				String textRecords = result.getRecords();
+				String end = "E" + ByteOperations.getHex(startAddress, 4);
+				if (generateListing) {
+					printStream.println(header);
+					printStream.print(textRecords);
+					printStream.println(end);
+				}
+				outputStream.println(header);
+				outputStream.print(textRecords);
+				outputStream.print(end);
 			}
 			catch (Exception e) {
 				printStream.println(e.getMessage());
@@ -114,9 +156,7 @@ public class Main {
 		}
 		finally {
 			// No matter what happens, close our output stream if it's open.
-			if (printStream != System.out) {
-				printStream.close();
-			}
+			outputStream.close();
 		}
 	}
 	
@@ -124,7 +164,9 @@ public class Main {
 	 * Prints usage information for users of this program.
 	 */
 	private static void printUsageInformation() {
-		System.out.println("Usage:\tjava Loader.Main [inputfiles] -o outfile");
+		System.out.println("Usage:\tjava Loader.Main [inputfiles] -o outfile [options]");
+		System.out.println("\t-l\tGenerate listing");
+		System.out.println("\t-a addr\tRelocate program to addr (4-digit hex memory address)");
 	}
 	
 	/**

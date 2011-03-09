@@ -128,7 +128,10 @@ public class Program {
 					}
 				}
 			}
+			address += instruction.getDefinition().getSize();
 		}
+		
+		address = this.origin;
 		
 		// Output instructions.
 		for (Instruction instruction : this.instructions) {

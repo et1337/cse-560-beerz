@@ -1,1 +1,1 @@
-java Assembler.Main %* -l
+java Assembler.Main %*
