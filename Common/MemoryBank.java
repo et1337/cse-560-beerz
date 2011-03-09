@@ -102,14 +102,13 @@ public class MemoryBank {
 	}
 	
 	/**
-	 * Return a copy of this MemoryBank, with the data relocated from the given starting location
+	 * Relocate the data in this MemoryBank from the given starting location
 	 * to the given new location, using the given relocation records.
 	 * @param a the original start address.
 	 * @param b the new start address.
 	 * @param relocationRecords a List of relocation records used to modify the text records.
-	 * @return a new Memory
 	 */
-	public MemoryBank relocate(int a, int b, List<SymbolEntry> relocationRecords) {
+	public void relocate(int a, int b, List<SymbolEntry> relocationRecords) {
 		for (SymbolEntry entry : relocationRecords) {
 			short value = this.read(entry.getAddress());
 			short address = (short)((value & entry.getMask()) >> entry.getLeastSignificantBit());
@@ -121,7 +120,9 @@ public class MemoryBank {
 		for (Map.Entry<Integer, Short> entry : this.data.entrySet()) {
 			bank.write(entry.getKey() + b - a, entry.getValue());
 		}
-		return bank;
+		this.firstAddress = bank.firstAddress;
+		this.lastAddress = bank.lastAddress;
+		this.data = bank.data;
 	}
 	
 	/**
@@ -157,5 +158,20 @@ public class MemoryBank {
 		for (Map.Entry<Integer, Short> entry : this.data.entrySet()) {
 			bank.write(entry.getKey(), entry.getValue());
 		}
+	}
+	
+	/**
+	 * Gets a String of text records representing this MemoryBank.
+	 * @return a String of text records representing this MemoryBank.
+	 */
+	public String getRecords() {
+		StringBuffer result = new StringBuffer();
+		for (Map.Entry<Integer, Short> entry : this.data.entrySet()) {
+			result.append("T");
+			result.append(ByteOperations.getHex(entry.getKey(), 4));
+			result.append(ByteOperations.getHex(entry.getValue(), 4));
+			result.append("\r\n");
+		}
+		return result.toString();
 	}
 }
