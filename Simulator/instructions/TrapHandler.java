@@ -50,6 +50,7 @@ public class TrapHandler extends InstructionHandler {
 				output.print((char) memory.read(memLocation));
 				memLocation++;
 			}
+			output.println();
 			break;
 		case 0x23:
 			InputStreamReader reader = new InputStreamReader(input);
