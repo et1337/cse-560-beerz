@@ -28,7 +28,7 @@ public class Assembler {
 	/**
 	 * The maximum number of source records a program is allowed to compile to.
 	 */
-	protected static final int MAX_SOURCE_RECORDS = 200;
+	protected static final int MAX_SOURCE_RECORDS = 2000;
 
 	/**
 	 * Assembles the given code into a Program.
