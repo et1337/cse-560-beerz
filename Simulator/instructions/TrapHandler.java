@@ -71,7 +71,7 @@ public class TrapHandler extends InstructionHandler {
 			try {
 				BufferedReader reader1 = new BufferedReader(new InputStreamReader(input));
 				number = Integer.parseInt(reader1.readLine());
-				reader1.close();
+		
 			}
 			catch (IOException e) {
 				e.printStackTrace(output);
