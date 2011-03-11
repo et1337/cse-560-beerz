@@ -86,6 +86,8 @@ public class Loader {
 						firstAddress = ByteOperations.parseHex(line.substring(7, 11));
 					segmentName = line.substring(1, 7);
 					lastAddress = firstAddress + ByteOperations.parseHex(line.substring(11)) - 1;
+					memory.adjustBounds(firstAddress);
+					memory.adjustBounds(lastAddress);
 					if(firstAddress > Loader.MAX_ADDRESS || lastAddress > Loader.MAX_ADDRESS) {
 						errors.add(new Error(lineNumber, "Memory segment length is too large for virtual machine."));
 					}

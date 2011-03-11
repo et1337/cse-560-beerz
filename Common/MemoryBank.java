@@ -46,10 +46,7 @@ public class MemoryBank {
 	 * @param value The 16-bit signed value to store in the memory cell.
 	 */
 	public void write(int address, short value) {
-		if (address > this.lastAddress)
-			this.lastAddress = address;
-		if (address < this.firstAddress)
-			this.firstAddress = address;
+		this.adjustBounds(address);
 		this.data.put(address, value);
 	}
 	
@@ -62,6 +59,19 @@ public class MemoryBank {
 		if (this.data.containsKey(address))
 			return this.data.get(address);
 		return 0;
+	}
+	
+	/**
+	 * Expands the first or last address of this MemoryBank to include the given value.
+	 * @param addres the first address with data in this MemoryBank.
+	 */
+	public void adjustBounds(int address) {
+		if (address < this.firstAddress) {
+			this.firstAddress = address;
+		}
+		if (address > this.lastAddress) {
+			this.lastAddress = address;
+		}
 	}
 	
 	/**
@@ -124,8 +134,8 @@ public class MemoryBank {
 		for (Map.Entry<Integer, Short> entry : this.data.entrySet()) {
 			bank.write(entry.getKey() + b - a, entry.getValue());
 		}
-		this.firstAddress = bank.firstAddress;
-		this.lastAddress = bank.lastAddress;
+		this.firstAddress += b - a;
+		this.lastAddress += b - a;
 		this.data = bank.data;
 	}
 	
