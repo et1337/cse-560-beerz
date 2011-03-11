@@ -16,7 +16,7 @@ public class Main {
 	 */
 	public static void main(String[] args) throws Exception {
 		// Print usage data if necessary
-		if (args.length < 2 || args[0].equals("--help") || args[0].equals("/?")) {
+		if (args.length < 1 || args[0].equals("--help") || args[0].equals("/?")) {
 			Main.printUsageInformation();
 			return;
 		}
