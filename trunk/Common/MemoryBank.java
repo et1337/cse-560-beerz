@@ -63,7 +63,7 @@ public class MemoryBank {
 	
 	/**
 	 * Expands the first or last address of this MemoryBank to include the given value.
-	 * @param addres the first address with data in this MemoryBank.
+	 * @param address an address that must be included in the range [this.firstAddress, this.lastAddress]
 	 */
 	public void adjustBounds(int address) {
 		if (address < this.firstAddress) {
