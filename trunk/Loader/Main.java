@@ -135,6 +135,8 @@ public class Main {
 				MemoryBank result = new MemoryBank();
 				for (ObjectFile file : objectFiles) {
 					MemoryBank bank = file.getMemoryBank();
+					result.adjustBounds(bank.getFirstAddress());
+					result.adjustBounds(bank.getLastAddress());
 					bank.resolveSymbols(symbolTables, file.getSymbolEntries());
 					bank.insertInto(result);
 				}
@@ -163,7 +165,9 @@ public class Main {
 		}
 		finally {
 			// No matter what happens, close our output stream if it's open.
-			outputStream.close();
+			if (outputStream != null) {
+				outputStream.close();
+			}
 		}
 	}
 	
