@@ -134,7 +134,7 @@ public class Loader {
 					}
 				}
 				else if (line.startsWith("I")) {
-					if (line.length() < Loader.EXPORT_RECORD_MIN_LENGTH)
+					if (line.length() < Loader.IMPORT_RECORD_MIN_LENGTH)
 						errors.add(new Error(lineNumber, "Length of import record is incorrect. Should be at least " + Integer.toString(Loader.IMPORT_RECORD_MIN_LENGTH) + " characters."));
 					else {
 						String name = line.substring(7);
