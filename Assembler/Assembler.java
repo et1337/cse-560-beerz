@@ -51,7 +51,7 @@ public class Assembler {
 		boolean hasOrig = false;
 		boolean hasEnd = false;
 		
-		String[] exports = new String[] { };
+		List<String> exports = new LinkedList<String>();
 		
 		String[] lines = data.split("\n");
 		for (String line : lines) {
@@ -281,7 +281,9 @@ public class Assembler {
 									"\" must be a valid symbol name."));
 							}
 						}
-						exports = operands;
+						for (String o : operands) {
+							exports.add(o);
+						}
 					}
 				} else if (op.equals(".EXT")) {
 					instruction.setOperands(operands, literals);
