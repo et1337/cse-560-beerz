@@ -131,6 +131,8 @@ public class Program {
 			address += instruction.getDefinition().getSize();
 		}
 		
+		if (this.startAddress < this.origin || this.startAddress > address)
+			errors.add(new Error("Invalid start execution address."));
 		address = this.origin;
 		
 		// Output instructions.

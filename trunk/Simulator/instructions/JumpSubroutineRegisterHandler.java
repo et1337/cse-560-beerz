@@ -66,7 +66,7 @@ public class JumpSubroutineRegisterHandler extends InstructionHandler {
 			state.registers[REG] = (short) pc;
 		}
 		index = index & ZERO_MASK;
-		state.programCounter = (memory.read(state.registers[baseRegister] + index));
+		state.programCounter = (state.registers[baseRegister] + index);
 	}
 	
 	@Override
